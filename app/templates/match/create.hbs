@@ -1,0 +1,28 @@
+{{title "Create Match"}}
+{{match-create-styles}}
+<div class="container">
+    <h1>Scoreboard - Create Match</h1>
+    <div class="form-group">
+        <label for="team1">Team 1</label>
+        <select id="team1" class="form-control" onchange={{action "selectTeam1" value="target.value" }}>
+            <option value="">Select Team 1</option>
+            {{#each teams as |team|}}
+            <option value={{team.id}}>{{team.name}}</option>
+            {{/each}}
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="team2">Team 2</label>
+        <select id="team2" class="form-control" onchange={{action "selectTeam2" value="target.value" }}>
+            <option value="">Select Team 2</option>
+            {{#each filteredTeams as |team|}}
+            <option value={{team.id}}>{{team.name}}</option>
+            {{/each}}
+        </select>
+    </div>
+    <button {{action "addMatch" }}>Create Match</button>
+    <p style="color: {{resultColor}};">{{resultMessage}}</p>
+
+    {{#link-to "match.index"}}← Back to Matches{{/link-to}}
+</div>

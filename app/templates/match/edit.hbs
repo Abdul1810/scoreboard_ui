@@ -1,0 +1,167 @@
+{{match-edit-styles}}
+<h3>Scoreboard - Update</h3>
+<p>{{result}}</p>
+<p>{{matchResult}}</p>
+<div class="container">
+    <div id="team1stats" class="team-stats" style="background-color: {{team1StatsBackground}}">
+        <label>{{team1}}</label>
+        <h3 style="display: flex; justify-content: center;margin:0">{{team1Stats}}</h3>
+        <div class="score-buttons" id="team1-container">
+            <button disabled={{eq-two current_batting "team2" "none"}} {{action "updateScore" 1}}>1️⃣</button>
+            <button disabled={{eq-two current_batting "team2" "none"}} {{action "updateScore" 2}}>✌️</button>
+            <button disabled={{eq-two current_batting "team2" "none"}} {{action "updateScore" 4}}>4️⃣</button>
+            <button disabled={{eq-two current_batting "team2" "none"}} {{action "updateScore" 6}}>🏏6️⃣</button>
+        </div>
+        <br>
+        <button class="out-button" disabled={{eq-two current_batting "team2" "none"}} {{action "updateScore" "out"}}>🚫 Out</button>
+        <br>
+        <br>
+        {{#if (not-eq bowler1 "")}}
+        <div>{{striker1}}</div>
+        <div>{{nonStriker1}}</div>
+        <div>Bowler: {{bowler1}}</div>
+        {{/if}}
+    </div>
+    <div id="team2stats" class="team-stats" style="background-color: {{team2StatsBackground}}">
+        <label>{{team2}}</label>
+        <h3 style="display: flex; justify-content: center;margin:0">{{team2Stats}}</h3>
+        <div class="score-buttons" id="team2-container">
+            <button disabled={{eq-two current_batting "team1" "none"}} {{action "updateScore" 1}}>1️⃣</button>
+            <button disabled={{eq-two current_batting "team1" "none"}} {{action "updateScore" 2}}>✌️</button>
+            <button disabled={{eq-two current_batting "team1" "none"}} {{action "updateScore" 4}}>4️⃣</button>
+            <button disabled={{eq-two current_batting "team1" "none"}} {{action "updateScore" 6}}>🏏6️⃣</button>
+        </div>
+        <br>
+        <button class="out-button" disabled={{eq-two current_batting "team1" "none"}} {{action "updateScore" "out"}}>🚫 Out</button>
+        <br>
+        <br>
+        {{#if (not-eq bowler2 "")}}
+        <div>{{striker2}}</div>
+        <div>{{nonStriker2}}</div>
+        <div>Bowler: {{bowler2}}</div>
+        {{/if}}
+    </div>
+</div>
+<br>
+
+<h3>{{team1}} Score-table</h3>
+<table border="1" style="width: 80%; margin: auto; border-collapse: collapse;">
+    <thead>
+        <tr>
+            <th>Players</th>
+            {{#each team1Players as |player index|}}
+            <th>{{player}} {{#if (eq current_batting "team1")}}{{#if (eq-inc index active_batsman_index)}}<span
+                    class="green-dot"></span>{{/if}}{{#if (eq-inc index passive_batsman_index)}}<span
+                    class="grey-dot"></span>{{/if}}{{/if}}</th>
+            {{/each}}
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Runs</td>
+            {{#each team1Runs as |runs|}}
+            <td>{{runs}}</td>
+            {{/each}}
+        </tr>
+        <tr>
+            <td>Balls</td>
+            {{#each team1Balls as |balls|}}
+            <td>{{balls}}</td>
+            {{/each}}
+        </tr>
+        <tr>
+            <td>Wicket Taker</td>
+            {{#each team1WicketsMap as |wicket|}}
+            <td>{{if wicket wicket "-"}}</td>
+            {{/each}}
+        </tr>
+    </tbody>
+</table>
+
+<h3>{{team2}} Score-table</h3>
+<table border="1" style="width: 80%; margin: auto; border-collapse: collapse;">
+    <thead>
+        <tr>
+            <th>Players</th>
+            {{#each team1Players as |player index|}}
+            <th>{{player}} {{#if (eq current_batting "team2")}}{{#if (eq-inc index active_batsman_index)}}<span
+                    class="green-dot"></span>{{/if}}{{#if (eq-inc index passive_batsman_index)}}<span
+                    class="grey-dot"></span>{{/if}}{{/if}}</th>
+            {{/each}}
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Runs</td>
+            {{#each team2Runs as |runs|}}
+            <td>{{runs}}</td>
+            {{/each}}
+        </tr>
+        <tr>
+            <td>Balls</td>
+            {{#each team2Balls as |balls|}}
+            <td>{{balls}}</td>
+            {{/each}}
+        </tr>
+        <tr>
+            <td>Wicket Taker</td>
+            {{#each team2WicketsMap as |wicket|}}
+            <td>{{if wicket wicket "-"}}</td>
+            {{/each}}
+        </tr>
+    </tbody>
+</table>
+
+<h3>{{team1}} Wicket-table</h3>
+<table border="1">
+    <thead>
+        <tr>
+            <th>Players</th>
+            {{#each team1Players as |player|}}
+            <th>{{player}} {{#if (eq current_batting "team2")}}{{#if (eq player bowler2)}}<span
+                    class="red-dot"></span>{{/if}}{{/if}}</th>
+            {{/each}}
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Balls</td>
+            {{#each team2Balls as |balls|}}
+            <td>{{balls}}</td>
+            {{/each}}
+        </tr>
+        <tr>
+            <td>Total Wickets</td>
+            {{#each team1Wickets as |wicket|}}
+            <td>{{if wicket wicket "-"}}</td>
+            {{/each}}
+        </tr>
+    </tbody>
+</table>
+
+<h3>{{team2}} Wicket-table</h3>
+<table border="1">
+    <thead>
+        <tr>
+            <th>Players</th>
+            {{#each team2Players as |player|}}
+            <th>{{player}} {{#if (eq current_batting "team1")}}{{#if (eq player bowler1)}}<span
+                    class="red-dot"></span>{{/if}}{{/if}}</th>
+            {{/each}}
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Balls</td>
+            {{#each team1Balls as |balls|}}
+            <td>{{balls}}</td>
+            {{/each}}
+        </tr>
+        <tr>
+            <td>Total Wickets</td>
+            {{#each team2Wickets as |wicket|}}
+            <td>{{if wicket wicket "-"}}</td>
+            {{/each}}
+        </tr>
+    </tbody>
+</table>

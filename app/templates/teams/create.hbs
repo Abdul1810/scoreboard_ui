@@ -1,0 +1,27 @@
+{{title "Create Team"}}
+{{team-create-styles}}
+
+<div class="container">
+  <h1>Scoreboard - Create Team</h1>
+
+  <h3><label for="name">Team Name</label></h3>
+  <div class="form-group full-width">
+    {{input type="text" id="name" placeholder="Enter Team Name" value=teamName required=true}}
+  </div>
+
+  <h3>Players</h3>
+  <button {{action "fillPlayers"}}>Fill Players</button>
+
+  {{#each players as |player index|}}
+    <div class="form-group">
+      <label for={{concat "player-" index}}>Player {{add index 1}}</label>
+      {{input type="text" id=(concat "player-" index) placeholder="Enter Player Name" value=player required=true}}
+    </div>
+  {{/each}}
+
+  <button {{action "addTeam"}}>Create Team</button>
+  
+  <p style="color: {{resultColor}};">{{resultMessage}}</p>
+
+  {{#link-to "teams.index"}}← Back to Teams{{/link-to}}
+</div>

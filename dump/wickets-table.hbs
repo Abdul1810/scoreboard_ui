@@ -1,0 +1,22 @@
+<thead>
+  <tr>
+    <th>Players</th>
+    {{#each players as |player|}}
+      <th>{{player}}</th>
+    {{/each}}
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>Balls</td>
+    {{#each balls as |ball|}}
+      <td>{{ball}}</td>
+    {{/each}}
+  </tr>
+  <tr>
+    <td>Total Wickets</td>
+    {{#each wickets as |wicket|}}
+      <td>{{wicket}}</td>
+    {{/each}}
+  </tr>
+</tbody>

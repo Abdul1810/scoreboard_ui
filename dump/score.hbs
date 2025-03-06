@@ -1,0 +1,40 @@
+{{score-styles}}
+<h3>Scoreboard - Update</h3>
+<p>{{result}}</p>
+<p>{{matchResult}}</p>
+
+{{!-- <div class="container">
+  {{team-stats
+    team='team1'
+    score=team1Score
+    striker=striker1
+    nonstriker=nonstriker1
+    bowler=bowler1
+    backgroundColor=team1StatsBackground
+    buttonsDisabled=team1ButtonsDisabled
+    outDisabled=team1OutDisabled
+    updateScore='updateScore'}}
+
+  {{team-stats
+    team='team2'
+    score=team2Score
+    striker=striker2
+    nonstriker=nonstriker2
+    bowler=bowler2
+    backgroundColor=team2StatsBackground
+    buttonsDisabled=team2ButtonsDisabled
+    outDisabled=team2OutDisabled
+    updateScore='updateScore'}}
+</div> --}}
+
+<h3>{{team1}} Score-table</h3>
+{{score-table players=team1Players runs=team1Runs balls=team1Balls wickets=team1Wickets}}
+
+<h3>{{team2}} Score-table</h3>
+{{score-table players=team2Players runs=team2Runs balls=team2Balls wickets=team2Wickets}}
+
+<h3>{{team1}} Wicket-table</h3>
+{{wicket-table players=team1Players balls=team1Balls wickets=team1Wickets}}
+
+<h3>{{team2}} Wicket-table</h3>
+{{wicket-table players=team2Players balls=team2Balls wickets=team2Wickets}}

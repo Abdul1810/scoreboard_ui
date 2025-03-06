@@ -1,0 +1,21 @@
+{{team-view-styles}}
+<div class="container">
+    <h1>{{model.name}}</h1>
+    <h3 id="result">{{resultMessage}}</h3>
+    <div id="team-info" class="team-info">
+        <p>Players:</p>
+        <ul class="players">
+            {{#each model.players as |player|}}
+            <li>
+                <span class="player-name">{{player}}</span>
+                <div class="action-buttons">
+                    <button class="calculate-btn" {{action "calculateScore" player}}>Runs</button>
+                    <button class="calculate-btn" {{action "calculateWickets" player}}>Wickets</button>
+                </div>
+            </li>
+            {{/each}}
+        </ul>
+    </div>
+
+    {{#link-to "teams.index" class="back-btn"}}← Back to Teams{{/link-to}}
+</div>

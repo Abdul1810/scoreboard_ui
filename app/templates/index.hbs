@@ -1,0 +1,19 @@
+{{title "All Matches"}}
+{{index-styles}}
+<div class="container">
+    <h1>Current Matches</h1>
+    <div id="matches" class="matches-list">
+        {{#if matches.length}}
+        {{#each matches as |match|}}
+        <div class="match-item">
+            {{#link-to 'score' match.id}}
+                {{match.team1}} vs {{match.team2}}
+            {{/link-to}}
+            <div class="match-date">{{match.date}}</div>
+        </div>
+        {{/each}}
+        {{else}}
+        <p class="no-matches">No matches found</p>
+        {{/if}}
+    </div>
+</div>

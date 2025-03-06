@@ -1,0 +1,35 @@
+{{title "All Teams"}}
+{{team-styles}}
+<div class="container">
+    <h1>Scoreboard - Teams</h1>
+    <div id="result" style="display: flex; justify-content: center;"></div>
+    {{#link-to "teams.create" class="create-team-btn"}}+ Create New Team{{/link-to}}
+    <div id="team-list" class="team-list">
+        {{#each slicedTeams as |team|}}
+        <div class="team-item">
+            <div class="info">
+                <span>{{team.name}}</span>
+                <br>
+                <p>Players:</p>
+                <ul class="players">
+                    {{#each team.firstHalf as |player|}}
+                    <li>{{player}}</li>
+                    {{/each}}
+                </ul>
+                <ul class="players">
+                    {{#each team.secondHalf as |player|}}
+                    <li>{{player}}</li>
+                    {{/each}}
+                </ul>
+            </div>
+            <div class="actions">
+                {{#link-to "teams.view" team.id class="open-btn"}}View{{/link-to}}
+                <br>
+                <button class="delete-btn" {{action "deleteTeam" team.id}}>Delete</button>
+            </div>
+        </div>
+        {{else}}
+        <div class="no-teams">No teams found.</div>
+        {{/each}}
+    </div>
+</div>

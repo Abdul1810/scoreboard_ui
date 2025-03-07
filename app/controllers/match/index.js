@@ -1,7 +1,8 @@
 import Ember from 'ember';
 
 export default Ember.Controller.extend({
-  matches: [],
+  ongoingMatches: [],
+  completedMatches: [],
   resultMessage: "Loading matches...",
   resultColor: "blue",
   socket: null,
@@ -41,7 +42,17 @@ export default Ember.Controller.extend({
 
     socket.onmessage = function (event) {
       let data = JSON.parse(event.data);
-      controller.set('matches', data);
+      controller.setProperties({
+        ongoingMatches: [],
+        completedMatches: []
+      });
+      data.forEach(match => {
+        if (match.is_completed === "true") {
+          controller.get('completedMatches').pushObject(match);
+        } else {
+          controller.get('ongoingMatches').pushObject(match);
+        }
+      });
     };
 
     this.set('socket', socket);

@@ -1,0 +1,31 @@
+<h3>{{team}} Score-table</h3>
+<table border="1" style="width: 80%; margin: auto; border-collapse: collapse;">
+    <thead>
+        <tr>
+            <th>Players</th>
+            {{#each players as |player index|}}
+            <th>
+                {{player}}
+                {{#if (eq current_batting teamId)}}
+                    {{#if (eq-inc index active_batsman_index)}}<span class="green-dot"></span>{{/if}}
+                    {{#if (eq-inc index passive_batsman_index)}}<span class="grey-dot"></span>{{/if}}
+                {{/if}}
+            </th>
+            {{/each}}
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Runs</td>
+            {{#each runs as |run|}} <td>{{run}}</td> {{/each}}
+        </tr>
+        <tr>
+            <td>Balls</td>
+            {{#each balls as |ball|}} <td>{{ball}}</td> {{/each}}
+        </tr>
+        <tr>
+            <td>Wicket Taker</td>
+            {{#each wicketsMap as |wicket|}} <td>{{if wicket wicket "-"}}</td> {{/each}}
+        </tr>
+    </tbody>
+</table>

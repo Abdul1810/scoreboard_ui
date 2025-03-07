@@ -2,19 +2,35 @@
 {{match-styles}}
 <div class="container">
   <h1>Scoreboard - Matches</h1>
-  
   <div class="create-links">
     {{#link-to "match.create"}}+ Create New Match{{/link-to}}
     {{#link-to "teams.create"}}+ Create New Team{{/link-to}}
   </div>
-
   <p style="color: {{resultColor}};">{{resultMessage}}</p>
 
-  <div id="matches" class="matches-list">
-    {{#if matches.length}}
-      {{#each matches as |match|}}
+  <div id="ongoing-matches" class="matches-list">
+    <h3>On-going Matches</h3>
+    {{#if ongoingMatches.length}}
+      {{#each ongoingMatches as |match|}}
         <div class="match-item">
           <h5>{{match.team1}} vs {{match.team2}}</h5>
+          <div class="match-actions">
+            {{#link-to "match.edit" match.id}}Edit{{/link-to}}
+            <button {{action "deleteMatch" match.id}}>Delete</button>
+          </div>
+        </div>
+      {{/each}}
+    {{else}}
+      <p>No matches found</p>
+    {{/if}}
+  </div>
+
+  <div id="completed-matches" class="matches-list">
+    <h3>Completed Matches</h3>
+    {{#if completedMatches.length}}
+      {{#each completedMatches as |match|}}
+        <div class="match-item">
+          <h5>{{match.team1}} vs {{match.team2}} <span style="color: #28a745;">({{match.winner}})</span></h5>
           <div class="match-actions">
             {{#link-to "match.edit" match.id}}Edit{{/link-to}}
             <button {{action "deleteMatch" match.id}}>Delete</button>

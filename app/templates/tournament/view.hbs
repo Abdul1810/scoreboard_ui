@@ -1,0 +1,54 @@
+{{title "All Matches of Tournament"}}
+{{match-styles}}
+<div class="container">
+  <h1>Scoreboard - Tournament Matches</h1>
+  <h3>{{tournament.name}}</h3>
+  <p style="color: {{resultColor}};">{{resultMessage}}</p>
+
+  {{#if (eq tournament.status "ongoing")}}
+  <div id="ongoing-matches" class="matches-list">
+    <h3>Ongoing Matches</h3>
+    {{#if ongoingMatches.name}}
+    <div class="match-item">
+      <h5>{{ongoingMatches.name}}</h5>
+      <div class="match-actions">
+        {{#link-to "match.edit" ongoingMatches.id}}Edit{{/link-to}}
+      </div>
+    </div>
+    {{else}}
+    <p>No matches found</p>
+    {{/if}}
+  </div>
+
+  <div id="upcoming-matches" class="matches-list">
+    <h3>Upcoming Matches</h3>
+    {{#if upcomingMatches.length}}
+    {{#each upcomingMatches as |match|}}
+    <div class="match-item">
+      <h5>{{match.name}}</h5>
+    </div>
+    {{/each}}
+    {{else}}
+    <p>No matches found</p>
+    {{/if}}
+  </div>
+  {{else}}
+  {{#link-to "tournament.view-line" tournament.id}}Open Graph{{/link-to}}
+  {{/if}}
+
+  <div id="completed-matches" class="matches-list">
+    <h3>Completed Matches</h3>
+    {{#if completedMatches.length}}
+    {{#each completedMatches as |match|}}
+    <div class="match-item">
+      <h5>{{match.name}} <span style="color: #28a745;">({{match.winner}})</span></h5>
+      <div class="match-actions">
+        {{#link-to "match.edit" match.id}}View{{/link-to}}
+      </div>
+    </div>
+    {{/each}}
+    {{else}}
+    <p>No matches found</p>
+    {{/if}}
+  </div>
+</div>

@@ -17,8 +17,37 @@ export default Ember.Route.extend({
 
   setupController(controller, model) {
     this._super(controller, model);
-
+    controller.setProperties({
+      team1Players: Ember.A([]),
+      team2Players: Ember.A([]),
+      team1Runs: Ember.A([]),
+      team2Runs: Ember.A([]),
+      team1Balls: Ember.A([]),
+      team2Balls: Ember.A([]),
+      team1WicketsMap: Ember.A([]),
+      team2WicketsMap: Ember.A([]),
+      team1Wickets: Ember.A([]),
+      team2Wickets: Ember.A([]),
+      result: "",
+      matchResult: "",
+      team1Stats: "",
+      team2Stats: "",
+      team1StatsBackground: "white",
+      team2StatsBackground: "white",
+      active_batsman_index: 0,
+      passive_batsman_index: 0,
+      striker1: "",
+      striker2: "",
+      nonStriker1: "",
+      nonStriker2: "",
+      bowler1: "",
+      bowler2: "",
+      reconnectInterval: 3000,
+      team1TotalBalls: Ember.A([]),
+      team2TotalBalls: Ember.A([]),
+    });
     if (model.error) {
+      controller.set('current_batting', 'none');
       controller.set('result', model.message);
     } else {
       document.title = `${model.team1} vs ${model.team2}`;

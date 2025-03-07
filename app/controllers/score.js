@@ -30,11 +30,12 @@ export default Ember.Controller.extend({
   bowler1: "",
   bowler2: "",
   reconnectInterval: 3000,
+  team1TotalBalls: Ember.A([]),
+  team2TotalBalls: Ember.A([]),
 
   initWebSocket(matchId) {
     const socketUrl = `ws://localhost:8080/ws/stats?id=${matchId}`;
     this.set('socket', new WebSocket(socketUrl));
-
     const socket = this.get('socket');
 
     socket.onopen = () => {
@@ -43,13 +44,20 @@ export default Ember.Controller.extend({
     };
 
     socket.onmessage = (event) => {
+      if (event.data === "not-found") {
+        window.location.reload();
+      }
       const data = JSON.parse(event.data);
       console.log(data);
-      this.updateScoreTable(data);
-      this.updateWicketsTable(data);
-      this.set('current_batting', data.current_batting);
       this.set('team1Stats', `${data.team1_score}/${data.team2_wickets} (${data.team1_balls})`);
       this.set('team2Stats', `${data.team2_score}/${data.team1_wickets} (${data.team2_balls})`);
+      this.updateScoreTable(data);
+      this.set('current_batting', data.current_batting);
+      let team1BallDistribution = distributeBalls(data.team1_balls);
+      let team2BallDistribution = distributeBalls(data.team2_balls);
+
+      this.set('team1TotalBalls', Ember.A(team1BallDistribution));
+      this.set('team2TotalBalls', Ember.A(team2BallDistribution));
 
       if (data.is_completed === "false") {
         this.handleMatchInProgress(data);
@@ -57,11 +65,35 @@ export default Ember.Controller.extend({
         this.handleMatchCompleted(data);
       }
     };
+    
+    function distributeBalls(totalBalls) {
+      let ballsArray = [];
+      let balls = totalBalls;
+      let i = 0;
+
+      while (balls > 0) {
+        if (balls >= 6) {
+          ballsArray.push(6);
+          balls -= 6;
+        } else {
+          ballsArray.push(balls);
+          balls = 0;
+        }
+        i++;
+      }
+
+      while (i < 11) {
+        ballsArray.push(0);
+        i++;
+      }
+
+      return ballsArray;
+    }
 
     socket.onclose = () => {
       this.set('result', "Connection closed. Attempting to reconnect...");
       setTimeout(() => {
-        window.location.reload();
+        this.initWebSocket(matchId);
       }, this.reconnectInterval);
     };
 

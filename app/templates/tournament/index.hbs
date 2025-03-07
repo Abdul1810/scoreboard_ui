@@ -1,0 +1,36 @@
+{{title "All Tournament"}}
+{{match-styles}}
+<div class="container">
+    <h1>Scoreboard - Tournament</h1>
+
+    <div class="create-links">
+        {{#link-to "tournament.create"}}+ Create New Tournament{{/link-to}}
+        {{#link-to "teams.create"}}+ Create New Team{{/link-to}}
+    </div>
+    <p style="color: {{resultColor}};">{{resultMessage}}</p>
+
+    <div id="tournaments" class="matches-list">
+        {{#if tournaments.length}}
+        {{#each tournaments as |tournament|}}
+        <div class="match-item">
+            <div style="display: flex; justify-content: space-between;">
+                <h5>{{tournament.name}}</h5>
+                <ul class="tournament-matches">
+                    {{#each tournament.matches as |match|}}
+                    <li>
+                        <p>{{match}}</p>
+                    </li>
+                    {{/each}}
+                </ul>
+            </div>
+            <div class="match-actions">
+                {{#link-to "tournament.view" tournament.id}}View{{/link-to}}
+                <button {{action "deleteTournament" tournament.id}}>Delete</button>
+            </div>
+        </div>
+        {{/each}}
+        {{else}}
+        <p>No tournaments found</p>
+        {{/if}}
+    </div>
+</div>

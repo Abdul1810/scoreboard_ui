@@ -1,0 +1,37 @@
+{{title "Create Tournament"}}
+{{match-create-styles}}
+<div class="container">
+    <h1>Scoreboard - Create Tournament</h1>
+    <div class="selected-teams">
+        <h3>Selected Teams</h3>
+        <ul>
+            {{#each selectedTeamNames as |team|}}
+            <li>{{team.name}}</li>
+            {{else}}
+            <li>No teams selected</li>
+            {{/each}}
+        </ul>
+    </div> 
+    <button style="margin-bottom: 10px;" {{action "selectAllTeams" }}>Select All Teams</button>
+    <div class="form-group">
+        <label for="team">Select Team to Add</label>
+        <select id="team" class="form-control" onchange={{action "selectTeam" value="target.value" }}
+            value={{selectedTeam}}>
+            <option value="">Select a Team</option>
+            {{#each filteredTeams as |team|}}
+            <option value={{team.id}}>{{team.name}}</option>
+            {{/each}}
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="tournament-name">Tournament Name</label>
+        <input type="text" id="tournament-name" class="form-control" value={{name}} oninput={{action (mut name)
+            value="target.value" }} />
+    </div>
+
+    <button {{action "addTournament" }}>Create Tournament</button>
+    <p style="color: {{resultColor}};">{{resultMessage}}</p>
+
+    {{#link-to "tournament.index"}}← Back to Tournaments{{/link-to}}
+</div>

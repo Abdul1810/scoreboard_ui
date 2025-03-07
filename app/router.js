@@ -7,6 +7,7 @@ const Router = Ember.Router.extend({
 
 Router.map(function () {
   this.route('index', { path: '/' });
+  this.route('score', { path: '/score/:match_id' });
   this.route('teams', function () {
     this.route('index', { path: '/' });
     this.route('create', { path: '/create' });
@@ -17,7 +18,12 @@ Router.map(function () {
     this.route('create', { path: '/create' });
     this.route('edit', { path: '/:match_id' });
   });
-  this.route('score', { path: '/score/:match_id' });
+  this.route('tournament', function () {
+    this.route('index', { path: '/' });
+    this.route('create', { path: '/create' });
+    this.route('view', { path: '/:tournament_id' });
+    this.route('view-line', { path: '/:tournament_id/line' });
+  });
 });
 
 export default Router;

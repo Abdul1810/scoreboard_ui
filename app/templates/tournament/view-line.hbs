@@ -1,0 +1,61 @@
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f4f4f4;
+    }
+
+    .bracket-container {
+        position: relative;
+        width: 600px;
+        height: 400px;
+    }
+
+    .bracket {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: repeat(4, 80px);
+        gap: 30px;
+        position: relative;
+    }
+
+    .match {
+        background-color: white;
+        border: 2px solid #333;
+        padding: 10px;
+        text-align: center;
+        font-weight: bold;
+        border-radius: 5px;
+        width: 140px;
+        position: absolute;
+    }
+
+    svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+
+    line {
+        stroke: black;
+        stroke-width: 2;
+    }
+</style>
+<div class="bracket-container">
+    <svg id="connections"></svg>
+    <div class="match" id="match1" style="top: 30px; left: 10px;"></div>
+    <div class="match" id="match2" style="top: 130px; left: 10px;"></div>
+    <div class="match" id="match3" style="top: 230px; left: 10px;"></div>
+    <div class="match" id="match4" style="top: 330px; left: 10px;"></div>
+
+    <div class="match" id="match5" style="top: 80px; left: 220px;"></div>
+    <div class="match" id="match6" style="top: 280px; left: 220px;"></div>
+
+    <div class="match" id="match7" style="top: 180px; left: 440px;"></div>
+</div>

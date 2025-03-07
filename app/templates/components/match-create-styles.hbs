@@ -16,20 +16,31 @@
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
-    h1 {
-        color: #333;
-        font-size: 24px;
-    }
-
     .form-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
         margin-bottom: 15px;
         text-align: left;
     }
 
-    label {
+    .form-group label {
         font-weight: bold;
         display: block;
         margin-bottom: 5px;
+    }
+
+    input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+
+    h1 {
+        color: #333;
+        font-size: 24px;
     }
 
     select {

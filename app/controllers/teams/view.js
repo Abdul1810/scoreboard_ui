@@ -2,7 +2,6 @@ import Ember from 'ember';
 
 export default Ember.Controller.extend({
   resultMessage: null,
-
   actions: {
     calculateScore(player) {
       this.set('resultMessage', "Loading...");

@@ -6,6 +6,7 @@ module.exports = function(environment) {
     contentSecurityPolicy: {
       'script-src' : "'unsafe-inline' 'self'",
       'style-src'  : "'unsafe-inline' 'self'",
+      'connect-src': "'self' ws://localhost:49152 ws://0.0.0.0:49152 http://localhost:4200/csp-report http://localhost:8080",
     },
     environment: environment,
     baseURL: '/',

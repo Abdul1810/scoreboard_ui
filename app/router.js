@@ -23,6 +23,8 @@ Router.map(function () {
     this.route('create', { path: '/create' });
     this.route('view', { path: '/:tournament_id' });
     this.route('view-graph', { path: '/:tournament_id/graph' });
+    this.route('view-teams', { path: '/:tournament_id/teams' });
+    this.route('view-stats');
   });
 });
 

@@ -1,0 +1,31 @@
+{{title "Tournament Teams"}}
+{{team-styles}}
+<div class="container">
+    <h1>Scoreboard - Tournament Teams</h1>
+    <p style="display: flex; justify-content: center; color: {{resultColor}};">{{{resultMessage}}}</p>
+    <div id="team-list" class="team-list">
+        {{#each teams as |team|}}
+        <div class="team-item">
+            <div class="info">
+                <span>{{team.name}}</span>
+                <br>
+                <p>Players:</p>
+                <ul class="players">
+                    {{#each team.players as |player|}}
+                    <li>
+                        {{player.name}}
+                        <button class="link-btn" {{action "getPlayerRuns" player.id}}>Total Runs</button>
+                        <button class="link-btn" {{action "getPlayerWickets" player.id}}>Total Wickets</button>
+                    </li>
+                    {{/each}}
+                </ul>
+            </div>
+            {{!-- <div class="actions">
+                {{#link-to "teams.view" team.id class="open-btn"}}View{{/link-to}}
+            </div> --}}
+        </div>
+        {{else}}
+        <div class="no-teams">No teams found.</div>
+        {{/each}}
+    </div>
+</div>

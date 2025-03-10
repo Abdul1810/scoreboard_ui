@@ -4,7 +4,7 @@ export default Ember.Route.extend({
     model(params) {
         return new Ember.RSVP.Promise((resolve) => {
             Ember.$.ajax({
-                url: `http://localhost:8080/api/tournaments?id=${params.tournament_id}`,
+                url: `http://localhost:8080/api/tournaments/teams?id=${params.tournament_id}`,
                 type: 'GET',
                 dataType: 'json'
             })
@@ -16,12 +16,15 @@ export default Ember.Route.extend({
     },
     setupController(controller, model) {
         this._super(controller, model);
-        controller.set('matches', Ember.A([]));
-        controller.set('winners', Ember.A([]));
-        model.matches.forEach((match) => {
-            controller.get('matches').pushObject(match);
-            controller.get('winners').pushObject(match.winner);
-        });
-        Ember.run.scheduleOnce('afterRender', controller, controller.drawBracket);
+        controller.set('tournamentId', this.paramsFor('tournament.view-teams').tournament_id);
+        if (model.error) {
+            controller.set('resultMessage', model.message);
+            controller.set('resultColor', 'red');
+            return;
+        } else {
+            controller.set('resultMessage', '');
+            controller.set('resultColor', 'blue');
+            controller.set('teams', model.teams);
+        }
     },
 });

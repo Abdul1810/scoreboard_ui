@@ -1,6 +1,6 @@
 import { moduleFor, test } from 'ember-qunit';
 
-moduleFor('route:tournament/view-line', 'Unit | Route | tournament/view line', {
+moduleFor('route:tournament/view-graph', 'Unit | Route | tournament/view line', {
   // Specify the other units that are required for this test.
   // needs: ['controller:foo']
 });

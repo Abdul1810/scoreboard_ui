@@ -6,5 +6,5 @@ export default Ember.Controller.extend({
     completedMatches: [],
     resultMessage: "",
     resultColor: "green",
-    ongoingMatches: {},
+    ongoingMatch: {},
 });

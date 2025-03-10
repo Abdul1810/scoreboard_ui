@@ -22,7 +22,7 @@ Router.map(function () {
     this.route('index', { path: '/' });
     this.route('create', { path: '/create' });
     this.route('view', { path: '/:tournament_id' });
-    this.route('view-line', { path: '/:tournament_id/line' });
+    this.route('view-graph', { path: '/:tournament_id/graph' });
   });
 });
 

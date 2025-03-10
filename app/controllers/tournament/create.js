@@ -42,9 +42,9 @@ export default Ember.Controller.extend({
         addTournament() {
             let selectedTeams = this.get('selectedTeams');
 
-            if (selectedTeams.length < 2) {
+            if (selectedTeams.length !== 8) {
                 this.setProperties({
-                    resultMessage: "At least two teams are required!",
+                    resultMessage: "Please select 8 teams",
                     resultColor: "red"
                 });
                 return;
@@ -74,7 +74,7 @@ export default Ember.Controller.extend({
                 .fail(function (jqXHR) {
                     console.error(jqXHR);
                     controller.setProperties({
-                        resultMessage: jqXHR.responseJSON.message,
+                        resultMessage: jqXHR.responseJSON.error,
                         resultColor: "red"
                     });
                 });

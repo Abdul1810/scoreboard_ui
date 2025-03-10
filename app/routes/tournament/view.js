@@ -33,9 +33,9 @@ export default Ember.Route.extend({
             });
             controller.set('upcomingMatches', controller.get('upcomingMatches').sort((a, b) => a.id - b.id));
             if (controller.get('upcomingMatches').length > 0) {
-                controller.set('ongoingMatches', controller.get('upcomingMatches').objectAt(0));
+                controller.set('ongoingMatch', controller.get('upcomingMatches').objectAt(0));
                 controller.get('upcomingMatches').removeAt(0);
-                console.log(controller.get('ongoingMatches'));
+                console.log(controller.get('ongoingMatch'));
                 console.log(controller.get('upcomingMatches'));
             }
 

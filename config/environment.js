@@ -3,6 +3,10 @@
 module.exports = function(environment) {
   var ENV = {
     modulePrefix: 'scoreboard-ui',
+    contentSecurityPolicy: {
+      'script-src' : "'unsafe-inline' 'self'",
+      'style-src'  : "'unsafe-inline' 'self'",
+    },
     environment: environment,
     baseURL: '/',
     locationType: 'auto',

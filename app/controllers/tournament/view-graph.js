@@ -8,7 +8,7 @@ export default Ember.Controller.extend({
         const matches = this.get('matches');
         const winners = this.get('winners');
         for (let i = 0; i < matches.length; i++) {
-            let matchElement = document.getElementById(`match${i + 1}`);
+            const matchElement = document.getElementById(`match${i + 1}`);
             if (matchElement) {
                 matchElement.innerHTML = `${matches[i].name}<br>Winner: ${winners[i]}`;
             }

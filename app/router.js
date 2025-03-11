@@ -17,6 +17,7 @@ Router.map(function () {
     this.route('index', { path: '/' });
     this.route('create', { path: '/create' });
     this.route('edit', { path: '/:match_id' });
+    this.route('highlights', { path: '/:match_id/highlights' });
   });
   this.route('tournament', function () {
     this.route('index', { path: '/' });
@@ -24,7 +25,6 @@ Router.map(function () {
     this.route('view', { path: '/:tournament_id' });
     this.route('view-graph', { path: '/:tournament_id/graph' });
     this.route('view-teams', { path: '/:tournament_id/teams' });
-    this.route('view-stats');
   });
 });
 

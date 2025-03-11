@@ -43,8 +43,25 @@
     </div>
 </div>
 <br>
-{{#if (eq is_highlights_uploaded "false")}}
-    <button class="uploadBtn" {{action "uploadHighlights"}}>+ Upload Highlights</button>
+{{#if (eq is_completed "true")}}
+    {{#if (eq is_highlights_uploaded "false")}}
+        {{#if selectedFileName}}
+            <div class="fileName">{{selectedFileName}}</div>
+        {{/if}}
+        <label class="uploadBtn">
+            + Upload Highlights
+            <input 
+                type="file" 
+                accept="video/*" 
+                class="uploadInput" 
+                onchange={{action "uploadHighlights" value="target.files"}} 
+                style="display: none;"
+            />
+        </label>
+    {{/if}}
+    {{#if (eq is_highlights_uploaded "true")}}
+    {{#link-to "match.highlights" model.id class="uploadInput"}}View Highlights{{/link-to}}
+    {{/if}}
 {{/if}}
 <br>
 {{score-table 

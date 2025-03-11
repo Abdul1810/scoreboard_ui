@@ -1,0 +1,70 @@
+{{title "Match Highlights"}}
+{{match-styles}}
+{{#if model.highlights_path}}
+<h2>{{team1}} vs {{team2}}<br>Match Highlights</h2>
+<p>{{{resultMessage}}}</p>
+<video id="highlight-vdo" width="480" height="360" controls preload="auto">
+    <source src={{concat "http://localhost:8080/video?name=" model.highlights_path}} type="video/mp4">
+    Your browser does not support the video tag.
+</video>
+{{else}}
+<p>No highlights found</p>
+{{/if}}
+<br>
+<h3>{{team1}} Players</h3>
+<table border="1" style="width: 80%; margin: auto; border-collapse: collapse;">
+    <thead>
+        <tr>
+            <th>Players</th>
+            {{#each team1_players as |player index|}}
+            <th>
+                {{player}}
+            </th>
+            {{/each}}
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Highlights</td>
+            {{#each team1_balls as |balls index|}}
+            <td>
+                {{#if (eq balls 0)}}
+                    <p>Not Batted</p>
+                {{else}}
+                <button class="link-btn" {{action "viewPlayerHighlights" "team1" index}}>View</button>
+                {{/if}}
+            </td> 
+            {{/each}}
+        </tr>
+    </tbody>
+</table>
+<h3>{{team2}} Players</h3>
+<br>
+<table border="1" style="width: 80%; margin: auto; border-collapse: collapse;">
+    <thead>
+        <tr>
+            <th>Players</th>
+            {{#each team2_players as |player index|}}
+            <th>
+                {{player}}
+            </th>
+            {{/each}}
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Highlights</td>
+            {{#each team2_balls as |balls index|}}
+            <td>
+                {{#if (eq balls 0)}}
+                    <p>No Batted</p>
+                {{else}}
+                <button class="link-btn" {{action "viewPlayerHighlights" "team2" index}}>View</button>
+                {{/if}}
+            </td> 
+            {{/each}}
+        </tr>
+    </tbody>
+</table>
+<br>
+{{#link-to "match.edit" model.id}}Back{{/link-to}}

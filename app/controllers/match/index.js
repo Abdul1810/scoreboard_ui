@@ -7,13 +7,11 @@ export default Ember.Controller.extend({
   resultColor: "blue",
   socket: null,
 
-  init() {
-    this._super(...arguments);
-    this.initWebSocket();
-  },
-
   initWebSocket() {
     let controller = this;
+    if (this.get('socket') !== null && this.get('socket').readyState === WebSocket.OPEN) {
+      this.get('socket').close();
+    }
     let socket = new WebSocket('ws://localhost:8080/ws/matches');
 
     socket.onopen = function () {

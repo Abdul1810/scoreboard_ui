@@ -33,6 +33,8 @@ export default Ember.Controller.extend({
   reconnectInterval: 3000,
   team1TotalBalls: 0,
   team2TotalBalls: 0,
+  selectedFileName: "",
+  is_completed: "false",
 
   initWebSocket(matchId) {
     const socketUrl = `ws://localhost:8080/ws/stats?id=${matchId}`;
@@ -54,6 +56,7 @@ export default Ember.Controller.extend({
       this.updateScoreTable(data);
       this.set('current_batting', data.current_batting);
       this.set('is_highlights_uploaded', data.is_highlights_uploaded);
+      this.set('is_completed', data.is_completed);
       this.set('team1Stats', `${data.team1_score}/${data.team2_wickets} (${data.team1_balls})`);
       this.set('team2Stats', `${data.team2_score}/${data.team1_wickets} (${data.team2_balls})`);
 
@@ -233,6 +236,26 @@ export default Ember.Controller.extend({
           console.error("Error updating score:", error);
           this.set('result', error.responseJSON.message);
           window.location.reload();
+        }
+      });
+    },
+    uploadHighlights(files) {
+      this.set('selectedFileName', files[0].name);
+      const formData = new FormData();
+      formData.append('file', files[0]);
+      Ember.$.ajax({
+        url: `http://localhost:8080/api/highlights?id=${this.get('model.id')}`,
+        type: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: (data) => {
+          this.set('result', data.message);
+          this.set('is_highlights_uploaded', "true");
+        },
+        error: (error) => {
+          console.error("Error uploading highlights:", error);
+          this.set('result', error.responseJSON.message);
         }
       });
     }

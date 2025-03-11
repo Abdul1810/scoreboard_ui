@@ -17,7 +17,8 @@ export default Ember.Route.extend({
     setupController(controller, model) {
         this._super(controller, model);
         controller.set('matches', Ember.A([]));
-        controller.set('winners', Ember.A([]));
+        controller.set('winners', Ember.A([]));        
+        controller.set('tournamentId', this.paramsFor('tournament.view-graph').tournament_id);
         model.matches.forEach((match) => {
             controller.get('matches').pushObject(match);
             controller.get('winners').pushObject(match.winner);

@@ -1,7 +1,31 @@
 {{team-view-styles}}
 <div class="container">
     <h1>{{model.name}}</h1>
-    <h3 id="result">{{resultMessage}}</h3>
+    <h3 id="result">{{{resultMessage}}}</h3>
+    {{#if tournamentsPresent}}
+    <table>
+        <thead>
+            <tr>
+                <th>Tournament Name</th>
+                <th>Runs Scored</th>
+                <th>Balls Faced</th>
+                <th>Wickets Taken</th>
+                <th>Matches Played</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each tournaments as |tournament|}}
+            <tr>
+                <td>{{tournament.name}}</td>
+                <td>{{tournament.total_runs}}</td>
+                <td>{{tournament.total_balls}}</td>
+                <td>{{tournament.total_wickets}}</td>
+                <td>{{tournament.total_matches}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+    {{/if}}
     <div id="team-info" class="team-info">
         <p>Players:</p>
         <ul class="players">

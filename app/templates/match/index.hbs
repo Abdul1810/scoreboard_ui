@@ -32,7 +32,7 @@
         <div class="match-item">
           <h5>{{match.team1}} vs {{match.team2}} <span style="color: #28a745;">({{match.winner}})</span></h5>
           <div class="match-actions">
-            {{#link-to "match.edit" match.id}}Edit{{/link-to}}
+            {{#link-to "match.edit" match.id}}View{{/link-to}}
             <button {{action "deleteMatch" match.id}}>Delete</button>
           </div>
         </div>

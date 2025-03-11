@@ -3,6 +3,7 @@ import Ember from 'ember';
 export default Ember.Controller.extend({
   socket: null,
   current_batting: "team1",
+  is_highlights_uploaded: "false",
   team1: "",
   team2: "",
   team1Players: Ember.A([]),
@@ -52,6 +53,7 @@ export default Ember.Controller.extend({
       console.log(data);
       this.updateScoreTable(data);
       this.set('current_batting', data.current_batting);
+      this.set('is_highlights_uploaded', data.is_highlights_uploaded);
       this.set('team1Stats', `${data.team1_score}/${data.team2_wickets} (${data.team1_balls})`);
       this.set('team2Stats', `${data.team2_score}/${data.team1_wickets} (${data.team2_balls})`);
 

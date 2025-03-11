@@ -2,6 +2,7 @@
 {{team-styles}}
 <div class="container">
     <h1>Scoreboard - Tournament Teams</h1>
+    {{#link-to "tournament.view" tournamentId class="back-btn" style="display: flex; justify-content: center;"}}← Back to Tournament{{/link-to}}
     <p style="display: flex; justify-content: center; color: {{resultColor}};">{{{resultMessage}}}</p>
     <div id="team-list" class="team-list">
         {{#each teams as |team|}}

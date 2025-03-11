@@ -23,8 +23,6 @@ export default Ember.Controller.extend({
                 });
         },
         getPlayerWickets(playerId) {
-            // /api/tournaments/total-wickets?id=1&player_id=1
-            // {"balls_bowled":18,"team_id":1,"matches_bowled":3,"player":"Abdul","total_wickets":17}
             const tournamentId = this.get('tournamentId');
             Ember.$.ajax({
                 url: `http://localhost:8080/api/tournaments/total-wickets?id=${tournamentId}&player_id=${playerId}`,

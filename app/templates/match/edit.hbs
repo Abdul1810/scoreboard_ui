@@ -43,7 +43,10 @@
     </div>
 </div>
 <br>
-
+{{#if (eq is_highlights_uploaded "false")}}
+    <button class="uploadBtn" {{action "uploadHighlights"}}>+ Upload Highlights</button>
+{{/if}}
+<br>
 {{score-table 
     teamId="team1"
     team=team1 

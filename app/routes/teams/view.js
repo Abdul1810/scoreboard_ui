@@ -18,7 +18,8 @@ export default Ember.Route.extend({
 
   setupController(controller, model) {
     this._super(controller, model);
-    
+    controller.set('tournaments', null);
+    controller.set('resultMessage', null);
     if (model.name) {
       document.title = `Team ${model.name}`;
     } else {

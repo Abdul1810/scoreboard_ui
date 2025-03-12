@@ -1,12 +1,12 @@
 {{title "Match Highlights"}}
 {{match-styles}}
-{{#if model.highlights_path}}
+{{#if highlights_path}}
 <h2>{{team1}} vs {{team2}}<br>Match Highlights</h2>
-<p>{{{resultMessage}}}</p>
-<video id="highlight-vdo" width="480" height="360" controls preload="auto">
-    <source src={{concat "http://localhost:8080/video?name=" model.highlights_path}} type="video/mp4">
+<video id="highlight-vdo" controls preload="auto">
+    <source src={{{concat "http://localhost:8080/video?name=" highlights_path "&total=1127&startTime=30&endTime=50"}}} type="video/mp4">
     Your browser does not support the video tag.
 </video>
+<h3>{{{highlights_path}}}</h3>
 {{else}}
 <p>No highlights found</p>
 {{/if}}
@@ -18,7 +18,7 @@
             <th>Players</th>
             {{#each team1_players as |player index|}}
             <th>
-                {{player}}
+                {{player.name}}
             </th>
             {{/each}}
         </tr>
@@ -26,16 +26,28 @@
     <tbody>
         <tr>
             <td>Highlights</td>
-            {{#each team1_balls as |balls index|}}
+            {{#each team1_players as |player index|}}
             <td>
-                {{#if (eq balls 0)}}
-                    <p>Not Batted</p>
+                {{#if (eq player.balls 0)}}
+                <p>No Batted</p>
                 {{else}}
-                <button class="link-btn" {{action "viewPlayerHighlights" "team1" index}}>View</button>
+                <button class="link-btn" {{action "seekTo" player.startTime}}>View</button>
                 {{/if}}
-            </td> 
+            </td>
             {{/each}}
         </tr>
+        {{!-- <tr>
+            <td>Start Time</td>
+            {{#each team1_players as |player index|}}
+            <td>
+                {{#if (eq player.balls 0)}}
+                <p>No Batted</p>
+                {{else}}
+                <p>{{format-secs player.startTime}}</p>
+                {{/if}}
+            </td>
+            {{/each}}
+        </tr> --}}
     </tbody>
 </table>
 <h3>{{team2}} Players</h3>
@@ -46,7 +58,7 @@
             <th>Players</th>
             {{#each team2_players as |player index|}}
             <th>
-                {{player}}
+                {{player.name}}
             </th>
             {{/each}}
         </tr>
@@ -54,16 +66,28 @@
     <tbody>
         <tr>
             <td>Highlights</td>
-            {{#each team2_balls as |balls index|}}
+            {{#each team2_players as |player index|}}
             <td>
-                {{#if (eq balls 0)}}
-                    <p>No Batted</p>
+                {{#if (eq player.balls 0)}}
+                <p>No Batted</p>
                 {{else}}
-                <button class="link-btn" {{action "viewPlayerHighlights" "team2" index}}>View</button>
+                <button class="link-btn" {{action "seekTo" player.startTime}}>View</button>
                 {{/if}}
-            </td> 
+            </td>
             {{/each}}
         </tr>
+        {{!-- <tr>
+            <td>Start Time</td>
+            {{#each team1_players as |player index|}}
+            <td>
+                {{#if (eq player.balls 0)}}
+                <p>No Batted</p>
+                {{else}}
+                <p>{{format-secs player.startTime}}</p>
+                {{/if}}
+            </td>
+            {{/each}}
+        </tr> --}}
     </tbody>
 </table>
 <br>

@@ -2,11 +2,35 @@
 {{match-styles}}
 {{#if highlights_path}}
 <h2>{{team1}} vs {{team2}}<br>Match Highlights</h2>
-<video id="highlight-vdo" controls preload="auto">
-    <source src={{{concat "http://localhost:8080/video?name=" highlights_path "&total=1127&startTime=30&endTime=50"}}} type="video/mp4">
-    Your browser does not support the video tag.
-</video>
-<h3>{{{highlights_path}}}</h3>
+<div style="position: relative;width: 512px;height: 288px;margin: auto;">
+    <video id="highlight-vdo" preload="auto" {{action "togglePlayPause" }}>
+        <source src={{{concat "http://localhost:8080/video?name=" highlights_path}}} type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    {{#if currentViewing}}
+    <div class="result-overlay">
+        <p>{{currentViewing}}</p>
+    </div>
+    {{/if}}
+    <div class="custom-controls">
+        <button class="controls-btn" {{action "togglePlayPause" }}>
+            {{#if isPlaying}}
+            ❚❚
+            {{else}}
+            ▶
+            {{/if}}
+        </button>
+        <input type="range" min={{startTime}} max={{totalTime}} value={{currentTime}} oninput={{action "seekVideo"
+            value="target.value" }} class="video-progress">
+        <span class="video-time">{{format-secs currentTime}} / {{format-secs totalTime}}</span>
+        {{#if (not-eq videoLength totalTime)}}
+        <button class="link-btn" {{action "viewOriginal" }}>View All</button>
+        {{/if}}
+    </div>
+</div>
+<br>
+<br>
+<h3>{{{resultMessage}}}</h3>
 {{else}}
 <p>No highlights found</p>
 {{/if}}
@@ -29,9 +53,9 @@
             {{#each team1_players as |player index|}}
             <td>
                 {{#if (eq player.balls 0)}}
-                <p>No Batted</p>
+                <p>-</p>
                 {{else}}
-                <button class="link-btn" {{action "seekTo" player.startTime}}>View</button>
+                <button class="link-btn" {{action "trimPart" "team1" index}}>View</button>
                 {{/if}}
             </td>
             {{/each}}
@@ -47,6 +71,16 @@
                 {{/if}}
             </td>
             {{/each}}
+        {{#if (not-eq videoLength totalTime)}}
+        {{#if (not-eq currentViewingIndex 0)}}
+        <button class="controls-btn" {{action "previousPlayer" }}>⏮</button>
+        {{/if}}
+        {{/if}}
+        {{#if (not-eq videoLength totalTime)}}
+        {{#if (not-eq currentViewingIndex 22)}}
+        <button class="controls-btn" {{action "nextPlayer" }}>⏭</button>
+        {{/if}}
+        {{/if}}
         </tr> --}}
     </tbody>
 </table>
@@ -69,9 +103,9 @@
             {{#each team2_players as |player index|}}
             <td>
                 {{#if (eq player.balls 0)}}
-                <p>No Batted</p>
+                <p>-</p>
                 {{else}}
-                <button class="link-btn" {{action "seekTo" player.startTime}}>View</button>
+                <button class="link-btn" {{action "trimPart" "team2" index}}>View</button>
                 {{/if}}
             </td>
             {{/each}}

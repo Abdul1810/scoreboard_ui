@@ -16,16 +16,6 @@ export default Ember.Route.extend({
     },
     setupController(controller, model) {
         this._super(...arguments);
-        controller.setProperties({
-            team1_balls: [],
-            team2_balls: [],
-            team1_players: [],
-            team2_players: [],
-            team1: "",
-            team2: "",
-            timestamps: {},
-            highlights_path: null
-        });
         if (model.error) {
             window.history.back();
         } else {
@@ -39,8 +29,17 @@ export default Ember.Route.extend({
         Ember.run.scheduleOnce('afterRender', this, () => {
             let videoElement = Ember.$('#highlight-vdo')[0];
             if (videoElement) {
+                videoElement.addEventListener('loadedmetadata', () => {
+                    controller.set('videoLength', videoElement.duration);
+                    controller.set('totalTime', videoElement.duration);
+                });
                 videoElement.addEventListener('timeupdate', () => {
                     const time = Math.floor(videoElement.currentTime);
+                    if (time >= controller.get('totalTime')) {
+                        controller.set('isPlaying', false);
+                        videoElement.pause();
+                    }
+                    controller.set('currentTime', time);
                     let player = controller.get('timestamps')[time];
                     if (player) {
                         controller.set('resultMessage', `${player} got out`);

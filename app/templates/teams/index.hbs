@@ -3,7 +3,11 @@
 <div class="container">
     <h1>Scoreboard - Teams</h1>
     <div id="result" style="display: flex; justify-content: center;"></div>
-    {{#link-to "teams.create" class="create-team-btn"}}+ Create New Team{{/link-to}}
+    <div style="display: flex; justify-content: center;">
+        {{#link-to "teams.create" class="create-team-btn"}}+ Create New Team{{/link-to}}
+        {{#link-to "match.index" class="create-team-btn"}}All Matches{{/link-to}}
+        {{#link-to "tournament.index" class="create-team-btn"}}View Tournaments{{/link-to}}
+    </div>
     <div id="team-list" class="team-list">
         {{#each slicedTeams as |team|}}
         <div class="team-item">

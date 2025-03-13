@@ -57,5 +57,12 @@ export default Ember.Route.extend({
       controller.set('team2', model.team2);
       controller.initWebSocket(model.id);
     }
+  },
+
+  actions: {
+    willTransition() {
+      this.controllerFor('match.edit').disconnectWebSocket();
+      return true;
+    }
   }
 });

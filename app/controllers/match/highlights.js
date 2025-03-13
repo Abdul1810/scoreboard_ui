@@ -106,19 +106,19 @@ export default Ember.Controller.extend({
             }
         },
 
-        previousPlayer() {
-            let index = this.get('currentViewingIndex');
-            if (index > 0) {
-                this.send('trimPart', index < 11 ? 'team1' : 'team2', index < 11 ? index - 1 : index - 11);
-            }
-        },
+        // previousPlayer() {
+        //     let index = this.get('currentViewingIndex');
+        //     if (index > 0) {
+        //         this.send('trimPart', index < 11 ? 'team1' : 'team2', index < 11 ? index - 1 : index - 11);
+        //     }
+        // },
 
-        nextPlayer() {
-            let index = this.get('currentViewingIndex');
-            if (index < 21) {
-                this.send('trimPart', index < 11 ? 'team1' : 'team2', index < 11 ? index + 1 : index - 11);
-            }
-        },
+        // nextPlayer() {
+        //     let index = this.get('currentViewingIndex');
+        //     if (index < 21) {
+        //         this.send('trimPart', index < 11 ? 'team1' : 'team2', index < 11 ? index + 1 : index - 11);
+        //     }
+        // },
 
         seekVideo(time) {
             this.seekTo(time);

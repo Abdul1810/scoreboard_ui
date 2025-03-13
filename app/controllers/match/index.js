@@ -56,6 +56,13 @@ export default Ember.Controller.extend({
     this.set('socket', socket);
   },
 
+  disconnectWebSocket() {
+    const socket = this.get('socket');
+    if (socket !== null && socket.readyState === WebSocket.OPEN) {
+      socket.close();
+    }
+  },
+
   actions: {
     deleteMatch(matchId) {
       if (confirm("Are you sure you want to delete this match?")) {

@@ -11,5 +11,12 @@ export default Ember.Route.extend({
             resultColor: "blue",
             socket: null
         });
+    },
+
+    actions: {
+        willTransition() {
+            this.controllerFor('match.index').disconnectWebSocket();
+            return true;
+        }
     }
 });

@@ -110,6 +110,13 @@ export default Ember.Controller.extend({
     };
   },
 
+  disconnectWebSocket() {
+    const socket = this.get('socket');
+    if (socket !== null && socket.readyState === WebSocket.OPEN) {
+      socket.close();
+    }
+  },
+
   handleMatchInProgress(data) {
     this.setProperties({
       active_batsman_index: data.active_batsman_index,

@@ -4,7 +4,7 @@ export default Ember.Controller.extend({
     matches: [],
     socket: null,
 
-    init() {
+    initWebSocket() {
         const socket = new WebSocket(`ws://localhost:8080/ws/matches`);
         this.set('socket', socket);
         socket.onmessage = (event) => {
@@ -13,10 +13,9 @@ export default Ember.Controller.extend({
         };
     },
 
-    willDestroy() {
-        this._super(...arguments);
+    disconnectWebSocket() {
         const socket = this.get('socket');
-        if (socket && socket.readyState === WebSocket.OPEN) {
+        if (socket !== null && socket.readyState === WebSocket.OPEN) {
             socket.close();
         }
     }

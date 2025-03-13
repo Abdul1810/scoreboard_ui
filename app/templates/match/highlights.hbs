@@ -21,7 +21,7 @@
             {{/if}}
         </button>
         <input type="range" min={{startTime}} max={{totalTime}} value={{currentTime}} oninput={{action "seekVideo"
-            value="target.value" }} class="video-progress">
+            value="target.value" }} class="video-progress"/>
         <span class="video-time">{{format-secs currentTime}} / {{format-secs totalTime}}</span>
         {{#if (not-eq videoLength totalTime)}}
         <button class="link-btn" {{action "viewOriginal" }}>View All</button>
@@ -125,6 +125,7 @@
     </tbody>
 </table>
 <br>
-{{#link-to "match.edit" model.id}}← Back to match{{/link-to}}
+{{!-- {{#link-to "match.edit" model.id}}← Back to match{{/link-to}} --}}
+<button class="link-btn" {{action "goBack"}}>← Back to match</button>
 <br>
 <br>

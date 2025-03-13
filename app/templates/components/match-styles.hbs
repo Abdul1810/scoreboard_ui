@@ -122,7 +122,7 @@
     table tbody tr:hover {
         background-color: #e6f7ff;
     }
-    
+
     .link-btn {
         background: none;
         border: none;
@@ -180,6 +180,24 @@
         width: calc(100% - 300px);
     }
 
+    .video-progress::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 15px;
+        height: 15px;
+        background-color: white;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+
+    .video-progress::-moz-range-thumb {
+        width: 15px;
+        height: 15px;
+        background-color: white;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+
     .video-time {
         margin-top: 8px;
     }
@@ -189,7 +207,7 @@
         height: 288px;
         border-radius: 5px;
     }
-    
+
     .result-overlay {
         position: absolute;
         bottom: 0px;

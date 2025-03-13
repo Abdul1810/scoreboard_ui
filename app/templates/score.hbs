@@ -1,5 +1,6 @@
 {{score-styles}}
 <h3>Scoreboard - View</h3>
+{{#link-to "index"}}← Back to Matches{{/link-to}}
 <p>{{result}}</p>
 <p>{{matchResult}}</p>
 <div class="container">
@@ -31,47 +32,49 @@
     </div>
 </div>
 <br>
-
-{{score-table 
-    teamId="team1"
-    team=team1 
-    players=team1Players 
-    runs=team1Runs 
-    balls=team1Balls 
-    wicketsMap=team1WicketsMap 
-    current_batting=current_batting
-    active_batsman_index=active_batsman_index
-    passive_batsman_index=passive_batsman_index
+{{#if highlightsPath}}
+{{#link-to "match.highlights" model.id class="link-btn"}}View Highlights{{/link-to}}
+{{/if}}
+{{score-table
+teamId="team1"
+team=team1
+players=team1Players
+runs=team1Runs
+balls=team1Balls
+wicketsMap=team1WicketsMap
+current_batting=current_batting
+active_batsman_index=active_batsman_index
+passive_batsman_index=passive_batsman_index
 }}
 
-{{score-table 
-    teamId="team2"
-    team=team2 
-    players=team2Players 
-    runs=team2Runs 
-    balls=team2Balls 
-    wicketsMap=team2WicketsMap 
-    current_batting=current_batting
-    active_batsman_index=active_batsman_index
-    passive_batsman_index=passive_batsman_index
+{{score-table
+teamId="team2"
+team=team2
+players=team2Players
+runs=team2Runs
+balls=team2Balls
+wicketsMap=team2WicketsMap
+current_batting=current_batting
+active_batsman_index=active_batsman_index
+passive_batsman_index=passive_batsman_index
 }}
 
-{{wicket-table 
-    team=team1 
-    opponent="team2"
-    players=team1Players 
-    balls=team2TotalBalls
-    wickets=team1Wickets 
-    bowler=bowler2
-    current_batting=current_batting
+{{wicket-table
+team=team1
+opponent="team2"
+players=team1Players
+balls=team2TotalBalls
+wickets=team1Wickets
+bowler=bowler2
+current_batting=current_batting
 }}
 
-{{wicket-table 
-    team=team2 
-    opponent="team1"
-    players=team2Players 
-    balls=team1TotalBalls
-    wickets=team2Wickets 
-    bowler=bowler1
-    current_batting=current_batting
+{{wicket-table
+team=team2
+opponent="team1"
+players=team2Players
+balls=team1TotalBalls
+wickets=team2Wickets
+bowler=bowler1
+current_batting=current_batting
 }}

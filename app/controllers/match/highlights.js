@@ -16,27 +16,6 @@ export default Ember.Controller.extend({
     currentViewing: null,
     currentViewingIndex: 0,
 
-    init() {
-        this._super(...arguments);
-        this.setProperties({
-            team1_balls: [],
-            team2_balls: [],
-            team1_players: [],
-            team2_players: [],
-            team1: "",
-            team2: "",
-            timestamps: {},
-            highlights_path: null,
-            videoLength: 0,
-            isPlaying: false,
-            startTime: 0,
-            currentTime: 0,
-            totalTime: 0,
-            currentViewing: null,
-            currentViewingIndex: 0
-        });
-    },
-
     seekTo(position) {
         let videoElement = Ember.$('#highlight-vdo')[0];
         if (videoElement) {
@@ -122,6 +101,10 @@ export default Ember.Controller.extend({
 
         seekVideo(time) {
             this.seekTo(time);
+        },
+
+        goBack() {
+            window.history.back();
         }
     }
 });

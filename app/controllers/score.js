@@ -32,6 +32,7 @@ export default Ember.Controller.extend({
   reconnectInterval: 3000,
   team1TotalBalls: Ember.A([]),
   team2TotalBalls: Ember.A([]),
+  highlightsPath: null,
 
   initWebSocket(matchId) {
     const socketUrl = `ws://localhost:8080/ws/stats?id=${matchId}`;

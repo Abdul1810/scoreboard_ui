@@ -3,24 +3,59 @@
 
 <div class="container">
   <h1>Scoreboard - Create Team</h1>
-
+  <h3><label for="name">Team Avatar</label></h3>
+  <label class="uploadBtn" style="display: none;">
+    + Upload Avatar
+    <input type="file" accept=".jpg, .jpeg, .png" id="team-logo" class="uploadInput" onchange={{action "uploadLogo"
+      value="target.files" }} style="display: none;" />
+  </label>
+  <div class="circle-avatar" {{action "triggerUpload" on="click" }}>
+    {{#if teamLogoURL}}
+    <img src={{teamLogoURL}} alt="Team Logo" height="100" width="100" />
+    {{else}}
+    <div style="color: #000;">?</div>
+    {{/if}}
+  </div>
+  {{#if teamLogoURL}}
+  <button {{action "removeLogo" }} class="link-btn">Remove</button>
+  {{/if}}
   <h3><label for="name">Team Name</label></h3>
-  <div class="form-group full-width">
+  <div class="form-group full-width" style="display: flex;justify-content: center;">
     {{input type="text" id="name" placeholder="Enter Team Name" value=teamName required=true}}
   </div>
 
   <h3>Players</h3>
-  <button {{action "fillPlayers"}}>Fill Players</button>
+  <button class="btn" {{action "fillPlayers" }}>Fill Players</button>
+  {{!-- <button {{action "fillAvatars" }}>Fill Avatars</button> --}}
 
-  {{#each players as |player index|}}
-    <div class="form-group">
-      <label for={{concat "player-" index}}>Player {{add index 1}}</label>
-      {{input type="text" id=(concat "player-" index) placeholder="Enter Player Name" value=player required=true}}
+  <label class="btn">
+    + Upload Avatars
+    <input type="file"   accept=".jpg, .jpeg, .png" id="player-avatars" class="uploadInput" onchange={{action "uploadAvatars"
+      value="target.files" }} multiple="true" style="display: none;" />
+  </label>
+  <div class="players-container">
+    <div class="avatar-column">
+      {{#each playerAvatarURLs as |playerAvatarURL index|}}
+      {{#if (eq playerAvatarURL "")}}
+      <div class="placeholder-avatar">
+        <span>{{add index 1}}</span>
+      </div>
+      {{else}}
+      <img src={{playerAvatarURL}} alt="Player Avatar" class="player-avatar" />
+      {{/if}}
+      {{/each}}
     </div>
-  {{/each}}
 
-  <button {{action "addTeam"}}>Create Team</button>
-  
+    <div class="input-column">
+      {{#each players as |player index|}}
+      <div class="player-input-wrapper">
+        <label for={{concat "player-" index}}>Player {{add index 1}}</label>
+        {{input type="text" id=(concat "player-" index) placeholder="Enter Player Name" value=player required=true}}
+      </div>
+      {{/each}}
+    </div>
+  </div>
+  <button class="btn" {{action "addTeam" }}>Create Team</button>
   <p style="color: {{resultColor}};">{{resultMessage}}</p>
 
   {{#link-to "teams.index"}}← Back to Teams{{/link-to}}

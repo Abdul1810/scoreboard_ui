@@ -48,7 +48,7 @@ export default Ember.Route.extend({
       team1TotalBalls: Ember.A([]),
       team2TotalBalls: Ember.A([]),
       highlightsPath: null,
-    })
+    });
     if (model.error) {
       controller.set('result', model.message);
     } else {

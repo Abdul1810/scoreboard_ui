@@ -1,24 +1,66 @@
 {{match-edit-styles}}
 <h3>Scoreboard - Update</h3>
-    {{#link-to "match.index"}}← Back to Matches{{/link-to}}
+<button class="link-btn" {{action "goBack" }}>← Back to Matches</button>
 <p>{{result}}</p>
 <p>{{matchResult}}</p>
 <div class="container">
     <div id="team1stats" class="team-stats" style="background-color: {{team1StatsBackground}}">
         <label>{{team1}}</label>
         <h3 style="display: flex; justify-content: center;margin:0">{{team1Stats}}</h3>
+        {{#if (any-true needChoosingBatsmanTeam1 needChoosingPassiveTeam1)}}
+        {{#if needChoosingBatsmanTeam1}}
+        <label for="team1">Choose Batsman</label>
+        <br>
+        <select id="team1" class="form-control" onchange={{action "selectBatsman" value="target.value" }}>
+            <option value="">Select Player</option>
+            {{#each notOutPlayersTeam1 as |team|}}
+            <option value={{team.index}}>{{team.name}}</option>
+            {{/each}}
+        </select>
+        {{/if}}
+        {{#if needChoosingPassiveTeam1}}
+        <br>
+        <label for="passiveTeam1">Choose Passive Batsman</label>
+        <br>
+        <select id="passiveTeam1" class="form-control" onchange={{action "selectBatsman" value="target.value" }}>
+            <option value="">Select Player</option>
+            {{#each notOutPlayersTeam1 as |team|}}
+            {{#if (not-eq selected1stBatsman team.index)}}
+            <option value={{team.index}}>{{team.name}}</option>
+            {{/if}}
+            {{/each}}
+        </select>
+        {{/if}}
+        {{else}}
+        {{#if needChoosingBowlerTeam2}}
+        <label for="bowler2">Choose Bowler</label>
+        <br>
+        <select id="bowler2" class="form-control" onchange={{action "selectBowler" value="target.value" }}>
+            <option value="">Select Bowler</option>
+            {{#each team2Players as |player index|}}
+            <option value={{index}}>{{player}}</option>
+            {{/each}}
+        </select>
+        {{else}}
         <div class="score-buttons" id="team1-container">
-            <button disabled={{eq-two current_batting "team2" "none"}} {{action "updateScore" 1}}>1️⃣</button>
-            <button disabled={{eq-two current_batting "team2" "none"}} {{action "updateScore" 2}}>✌️</button>
-            <button disabled={{eq-two current_batting "team2" "none"}} {{action "updateScore" 4}}>4️⃣</button>
-            <button disabled={{eq-two current_batting "team2" "none"}} {{action "updateScore" 6}}>🏏6️⃣</button>
+            <button disabled={{eq-two current_batting "team2" "none" }} {{action "updateScore" 1}}>1️⃣</button>
+            <button disabled={{eq-two current_batting "team2" "none" }} {{action "updateScore" 2}}>✌️</button>
+            <button disabled={{eq-two current_batting "team2" "none" }} {{action "updateScore" 4}}>4️⃣</button>
+            <button disabled={{eq-two current_batting "team2" "none" }} {{action "updateScore" 6}}>🏏6️⃣</button>
         </div>
         <br>
-        <button class="out-button" disabled={{eq-two current_batting "team2" "none"}} {{action "updateScore" "out"}}>🚫 Out</button>
+        <button class="out-button" disabled={{eq-two current_batting "team2" "none" }} {{action "updateScore" "wide"
+            }}>⚪ Wide</button>
+        <button class="out-button" disabled={{eq-two current_batting "team2" "none" }} {{action "updateScore" "out"
+            }}>🚫 Out</button>
+        <button class="out-button" disabled={{eq-two current_batting "team2" "none" }} {{action "updateScore" "noball"
+            }}>🔴 No ball</button>
+        {{/if}}
+        {{/if}}
         <br>
         <br>
         {{#if (not-eq bowler1 "")}}
-        <div>{{striker1}}</div>
+        <div>{{#if striker1}}{{striker1}}{{else}}Striker:{{/if}}</div>
         <div>{{nonStriker1}}</div>
         <div>Bowler: {{bowler1}}</div>
         {{/if}}
@@ -26,18 +68,58 @@
     <div id="team2stats" class="team-stats" style="background-color: {{team2StatsBackground}}">
         <label>{{team2}}</label>
         <h3 style="display: flex; justify-content: center;margin:0">{{team2Stats}}</h3>
+        {{#if needChoosingBatsmanTeam2}}
+        <label for="team2">Team 2 Players</label>
+        <br>
+        <select id="team2" class="form-control" onchange={{action "selectBatsman" value="target.value" }}>
+            <option value="">Select Team 2</option>
+            {{#each notOutPlayersTeam2 as |team|}}
+            <option value={{team.index}}>{{team.name}}</option>
+            {{/each}}
+        </select>
+        {{#if needChoosingPassiveTeam2}}
+        <br>
+        <label for="passiveTeam2">Choose Passive Batsman</label>
+        <br>
+        <select id="passiveTeam2" class="form-control" onchange={{action "selectBatsman" value="target.value" }}>
+            <option value="">Select Player</option>
+            {{#each notOutPlayersTeam2 as |team|}}
+            {{#if (not-eq selected1stBatsman team.index)}}
+            <option value={{team.index}}>{{team.name}}</option>
+            {{/if}}
+            {{/each}}
+        </select>
+        {{/if}}
+        {{else}}
+        {{#if needChoosingBowlerTeam1}}
+        <label for="bowler1">Choose Bowler</label>
+        <br>
+        <select id="bowler1" class="form-control" onchange={{action "selectBowler" value="target.value" }}>
+            <option value="">Select Bowler</option>
+            {{#each team1Players as |player index|}}
+            <option value={{index}}>{{player}}</option>
+            {{/each}}
+        </select>
+        {{else}}
         <div class="score-buttons" id="team2-container">
-            <button disabled={{eq-two current_batting "team1" "none"}} {{action "updateScore" 1}}>1️⃣</button>
-            <button disabled={{eq-two current_batting "team1" "none"}} {{action "updateScore" 2}}>✌️</button>
-            <button disabled={{eq-two current_batting "team1" "none"}} {{action "updateScore" 4}}>4️⃣</button>
-            <button disabled={{eq-two current_batting "team1" "none"}} {{action "updateScore" 6}}>🏏6️⃣</button>
+            <button disabled={{eq-two current_batting "team1" "none" }} {{action "updateScore" 1}}>1️⃣</button>
+            <button disabled={{eq-two current_batting "team1" "none" }} {{action "updateScore" 2}}>✌️</button>
+            <button disabled={{eq-two current_batting "team1" "none" }} {{action "updateScore" 4}}>4️⃣</button>
+            <button disabled={{eq-two current_batting "team1" "none" }} {{action "updateScore" 6}}>🏏6️⃣</button>
         </div>
         <br>
-        <button class="out-button" disabled={{eq-two current_batting "team1" "none"}} {{action "updateScore" "out"}}>🚫 Out</button>
+        <button class="out-button" disabled={{eq-two current_batting "team1" "none" }} {{action "updateScore" "wide"
+            }}>⚪ Wide</button>
+        <button class="out-button" disabled={{eq-two current_batting "team1" "none" }} {{action "updateScore" "out"
+            }}>🚫 Out</button>
+        <button class="out-button" disabled={{eq-two current_batting "team1" "none" }} {{action "updateScore" "noball"
+            }}>🔴 No ball</button>
+        {{/if}}
+        {{/if}}
         <br>
         <br>
         {{#if (not-eq bowler2 "")}}
-        <div>{{striker2}}</div>
+        <div>{{#if striker2}}{{striker2}}{{else}}Striker:{{/if}}</div>
         <div>{{nonStriker2}}</div>
         <div>Bowler: {{bowler2}}</div>
         {{/if}}
@@ -45,66 +127,73 @@
 </div>
 <br>
 {{#if (eq is_completed "true")}}
-    {{#if (eq is_highlights_uploaded "false")}}
-        {{#if selectedFileName}}
-            <div class="fileName">{{selectedFileName}}</div>
-        {{/if}}
-        <label class="uploadBtn">
-            + Upload Highlights
-            <input 
-                type="file" 
-                accept="video/*" 
-                class="uploadInput" 
-                onchange={{action "uploadHighlights" value="target.files"}} 
-                style="display: none;"
-            />
-        </label>
-    {{/if}}
-    {{#if (eq is_highlights_uploaded "true")}}
-    {{#link-to "match.highlights" model.id class="uploadInput"}}View Highlights{{/link-to}}
-    {{/if}}
+<dialog id="matchBannerDialog">
+    <div class="dialog-content">
+        <img src="http://localhost:8080/image/banner?id={{model.id}}" alt="Match Banner" class="banner-img" />
+        <button onclick={{action "closeDialog"}} class="close-btn">✖</button>
+    </div>
+</dialog>
+
+<button onclick={{action "openDialog"}} class="link-btn">🏆 View Match Banner</button>
 {{/if}}
 <br>
-{{score-table 
-    teamId="team1"
-    team=team1 
-    players=team1Players 
-    runs=team1Runs 
-    balls=team1Balls 
-    wicketsMap=team1WicketsMap 
-    current_batting=current_batting
-    active_batsman_index=active_batsman_index
-    passive_batsman_index=passive_batsman_index
+<br>
+{{#if (eq is_completed "true")}}
+{{#if (eq is_highlights_uploaded "false")}}
+{{#if selectedFileName}}
+<div class="fileName">{{selectedFileName}}</div>
+{{/if}}
+<label class="uploadBtn">
+    + Upload Highlights
+    <input type="file" accept="video/*" class="uploadInput" onchange={{action "uploadHighlights" value="target.files" }}
+        style="display: none;" />
+</label>
+{{/if}}
+{{#if (eq is_highlights_uploaded "true")}}
+{{#link-to "match.highlights" model.id class="uploadInput"}}View Highlights{{/link-to}}
+{{/if}}
+{{/if}}
+<br>
+{{score-table
+teamId="team1"
+team=team1
+players=team1Players
+runs=team1Runs
+balls=team1Balls
+wicketsMap=team1WicketsMap
+current_batting=current_batting
+active_batsman_index=active_batsman_index
+passive_batsman_index=passive_batsman_index
 }}
 
-{{score-table 
-    teamId="team2"
-    team=team2 
-    players=team2Players 
-    runs=team2Runs 
-    balls=team2Balls 
-    wicketsMap=team2WicketsMap 
-    current_batting=current_batting
-    active_batsman_index=active_batsman_index
-    passive_batsman_index=passive_batsman_index
+{{score-table
+teamId="team2"
+team=team2
+players=team2Players
+runs=team2Runs
+balls=team2Balls
+wicketsMap=team2WicketsMap
+current_batting=current_batting
+active_batsman_index=active_batsman_index
+passive_batsman_index=passive_batsman_index
 }}
 
-{{wicket-table 
-    team=team1 
-    opponent="team2"
-    players=team1Players 
-    balls=team2TotalBalls
-    wickets=team1Wickets 
-    bowler=bowler2
-    current_batting=current_batting
+{{wicket-table
+team=team1
+opponent="team2"
+players=team1Players
+balls=team2TotalBalls
+wickets=team1Wickets
+bowler=bowler2
+current_batting=current_batting
 }}
 
-{{wicket-table 
-    team=team2 
-    opponent="team1"
-    players=team2Players 
-    balls=team1TotalBalls
-    wickets=team2Wickets 
-    bowler=bowler1
-    current_batting=current_batting
+{{wicket-table
+team=team2
+opponent="team1"
+players=team2Players
+balls=team1TotalBalls
+wickets=team2Wickets
+bowler=bowler1
+current_batting=current_batting
 }}

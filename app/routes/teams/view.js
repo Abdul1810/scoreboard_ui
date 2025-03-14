@@ -7,6 +7,7 @@ export default Ember.Route.extend({
         return {
           id: team.id,
           name: team.name,
+          logo: team.logo,
           players: team.players
         };
       })

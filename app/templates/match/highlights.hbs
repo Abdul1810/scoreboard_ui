@@ -4,7 +4,7 @@
 <h2>{{team1}} vs {{team2}}<br>Match Highlights</h2>
 <div style="position: relative;width: 512px;height: 288px;margin: auto;">
     <video id="highlight-vdo" preload="auto" {{action "togglePlayPause" }}>
-        <source src={{{concat "http://localhost:8080/video?name=" highlights_path}}} type="video/mp4">
+        <source src={{{concat "http://localhost:8080/video/highlights?name=" highlights_path}}} type="video/mp4">
         Your browser does not support the video tag.
     </video>
     {{#if currentViewing}}

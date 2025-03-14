@@ -1,5 +1,6 @@
 {{team-view-styles}}
 <div class="container">
+    <img src={{model.logo}} alt="Team Logo" height="100" width="100" class="circle-avatar" />
     <h1>{{model.name}}</h1>
     <h3 id="result">{{{resultMessage}}}</h3>
     {{#if tournamentsPresent}}
@@ -31,7 +32,10 @@
         <ul class="players">
             {{#each model.players as |player|}}
             <li>
-                <span class="player-name">{{player}}</span>
+                <span class="player-name">
+                    <img src={{player.avatar}} alt="Team Logo" height="30" width="30" />
+                    {{player.name}}
+                </span>
                 <div class="action-buttons">
                     <button class="calculate-btn" {{action "calculateScore" player}}>Runs</button>
                     <button class="calculate-btn" {{action "calculateWickets" player}}>Wickets</button>

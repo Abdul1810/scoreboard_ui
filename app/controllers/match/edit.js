@@ -24,6 +24,7 @@ export default Ember.Controller.extend({
   team2StatsBackground: "white",
   active_batsman_index: 0,
   passive_batsman_index: 0,
+  active_bowler_index: 0,
   striker1: "",
   striker2: "",
   nonStriker1: "",
@@ -35,6 +36,15 @@ export default Ember.Controller.extend({
   team2TotalBalls: 0,
   selectedFileName: "",
   is_completed: "false",
+  needChoosingBatsmanTeam1: false,
+  needChoosingBatsmanTeam2: false,
+  needChoosingPassiveTeam1: false,
+  needChoosingPassiveTeam2: false,
+  needChoosingBowlerTeam1: false,
+  needChoosingBowlerTeam2: false,
+  notOutPlayersTeam1: {},
+  notOutPlayersTeam2: {},
+  selected1stBatsman: "",
 
   initWebSocket(matchId) {
     const socketUrl = `ws://localhost:8080/ws/stats?id=${matchId}`;
@@ -60,8 +70,9 @@ export default Ember.Controller.extend({
       this.set('team1Stats', `${data.team1_score}/${data.team2_wickets} (${data.team1_balls})`);
       this.set('team2Stats', `${data.team2_score}/${data.team1_wickets} (${data.team2_balls})`);
 
-      let team1BallDistribution = distributeBalls(data.team1_balls);
-      let team2BallDistribution = distributeBalls(data.team2_balls);
+      let team1BallDistribution = distributeBalls(data.team2_bowling_order, data.team1_balls);
+      let team2BallDistribution = distributeBalls(data.team1_bowling_order, data.team2_balls);
+
 
       this.set('team1TotalBalls', Ember.A(team1BallDistribution));
       this.set('team2TotalBalls', Ember.A(team2BallDistribution));
@@ -73,27 +84,18 @@ export default Ember.Controller.extend({
       }
     };
 
-    function distributeBalls(totalBalls) {
-      let ballsArray = [];
+    function distributeBalls(overArray, totalBalls) {
+      let ballsArray = Array(11).fill(0);
       let balls = totalBalls;
-      let i = 0;
-
-      while (balls > 0) {
+      for (let i = 0; i < overArray.length; i++) {
         if (balls >= 6) {
-          ballsArray.push(6);
+          ballsArray[overArray[i] - 1] += 6;
           balls -= 6;
         } else {
-          ballsArray.push(balls);
-          balls = 0;
+          ballsArray[overArray[i] - 1] += balls;
+          break;
         }
-        i++;
       }
-
-      while (i < 11) {
-        ballsArray.push(0);
-        i++;
-      }
-
       return ballsArray;
     }
 
@@ -121,31 +123,116 @@ export default Ember.Controller.extend({
     this.setProperties({
       active_batsman_index: data.active_batsman_index,
       passive_batsman_index: data.passive_batsman_index,
+      active_bowler_index: data.active_bowler_index,
     });
 
     const isTeam1Batting = data.current_batting === "team1";
     const battingTeam = isTeam1Batting ? this.team1Players : this.team2Players;
-    const bowlerName = this.getBowlerName(isTeam1Batting ? data.team1_balls : data.team2_balls);
+    // const bowlerName = this.getBowlerName(isTeam1Batting ? data.team1_balls : data.team2_balls);
+    const bowlerName = data.active_bowler_index === -1 ? "Select Bowler" :
+      isTeam1Batting ? this.get('team2Players')[data.active_bowler_index - 1] : this.get('team1Players')[data.active_bowler_index - 1];
 
     this.setProperties({
-      matchResult: `${battingTeam[data.active_batsman_index - 1]} is batting\n${battingTeam[data.passive_batsman_index - 1]} is waiting`,
+      matchResult: data.active_batsman_index === -1 ? "Waiting for Batsman" : `${battingTeam[data.active_batsman_index - 1]} is batting\n${data.passive_batsman_index === -1 ? "Waiting for Batsman" : `${battingTeam[data.passive_batsman_index - 1]} is waiting`}`,
       team1StatsBackground: isTeam1Batting ? "aliceblue" : "white",
       team2StatsBackground: isTeam1Batting ? "white" : "aliceblue",
     });
 
-    this.updateWicketsTable(data);
+    if (data.current_batting === "team1") {
+      if (data.team1_freehits_map.includes((parseInt(data.team1_balls) + 1))) {
+        this.set('matchResult', "Free Hit");
+      }
+    } else if (data.current_batting === "team2") {
+      if (data.team2_freehits_map.includes((parseInt(data.team2_balls) + 1))) {
+        this.set('matchResult', "Free Hit");
+      }
+    }
 
+    if (data.active_batsman_index === -1) {
+      if (data.current_batting === "team1") {
+        this.set('needChoosingBatsmanTeam1', true);
+        let notOutPlayerIndicesTeam1 = data.team1_wickets_map.map((wicket, index) => {
+          if (wicket === null && index !== data.passive_batsman_index - 1) {
+            return index;
+          }
+        }).filter((index) => index !== undefined);
+        let notOutPlayersTeam1 = notOutPlayerIndicesTeam1.map((index) => {
+          return { name: battingTeam[index], index: index + 1 };
+        });
+        this.set('notOutPlayersTeam1', notOutPlayersTeam1);
+      } else if (data.current_batting === "team2") {
+        this.set('needChoosingBatsmanTeam2', true);
+        let notOutPlayerIndicesTeam2 = data.team2_wickets_map.map((wicket, index) => {
+          if (wicket === null && index !== data.passive_batsman_index - 1) {
+            return index;
+          }
+        }).filter((index) => index !== undefined);
+        let notOutPlayersTeam2 = notOutPlayerIndicesTeam2.map((index) => {
+          return { name: battingTeam[index], index: index + 1 };
+        });
+        this.set('notOutPlayersTeam2', notOutPlayersTeam2);
+      }
+    } else {
+      this.set('needChoosingBatsmanTeam1', false);
+      this.set('needChoosingBatsmanTeam2', false);
+    }
+
+    if (data.active_bowler_index === -1) {
+      if (data.current_batting === "team1") {
+        this.set('needChoosingBowlerTeam2', true);
+      } else if (data.current_batting === "team2") {
+        this.set('needChoosingBowlerTeam1', true);
+      }
+    } else {
+      this.set('needChoosingBowlerTeam1', false);
+      this.set('needChoosingBowlerTeam2', false);
+    }
+
+    if (data.passive_batsman_index === -1) {
+      if (data.current_batting === "team1") {
+        this.set('needChoosingPassiveTeam1', true);
+        let notOutPlayerIndicesTeam1 = data.team1_wickets_map.map((wicket, index) => {
+          if (wicket === null && index !== data.active_batsman_index - 1) {
+            return index;
+          }
+        }).filter((index) => index !== undefined);
+        let notOutPlayersTeam1 = notOutPlayerIndicesTeam1.map((index) => {
+          return { name: battingTeam[index], index: index + 1 };
+        });
+        this.set('notOutPlayersTeam1', notOutPlayersTeam1);
+      } else if (data.current_batting === "team2") {
+        this.set('needChoosingPassiveTeam2', true);
+        let notOutPlayerIndicesTeam2 = data.team2_wickets_map.map((wicket, index) => {
+          if (wicket === null && index !== data.active_batsman_index - 1) {
+            return index;
+          }
+        }).filter((index) => index !== undefined);
+        let notOutPlayersTeam2 = notOutPlayerIndicesTeam2.map((index) => {
+          return { name: battingTeam[index], index: index + 1 };
+        });
+        this.set('notOutPlayersTeam2', notOutPlayersTeam2);
+      }
+    } else {
+      this.set('needChoosingPassiveTeam1', false);
+      this.set('needChoosingPassiveTeam2', false);
+    }
+
+    this.updateWicketsTable(data);
     this.setProperties(isTeam1Batting ? {
       bowler1: `${bowlerName}`,
-      striker1: `Batting: ${battingTeam[data.active_batsman_index - 1]}`,
-      nonStriker1: `Waiting: ${battingTeam[data.passive_batsman_index - 1]}`,
+      striker1: data.active_batsman_index === -1 ? "Select Batsman" :
+        `Batting: ${battingTeam[data.active_batsman_index - 1]}`,
+      nonStriker1: data.passive_batsman_index === -1 ? "Select Batsman" :
+        `Waiting: ${battingTeam[data.passive_batsman_index - 1]}`,
       bowler2: "",
       striker2: "",
       nonStriker2: ""
     } : {
       bowler2: `${bowlerName}`,
-      striker2: `Batting: ${battingTeam[data.active_batsman_index - 1]}`,
-      nonStriker2: `Waiting: ${battingTeam[data.passive_batsman_index - 1]}`,
+      striker2: data.active_batsman_index === -1 ? "Select Batsman" :
+        `Batting: ${battingTeam[data.active_batsman_index - 1]}`,
+      nonStriker2: data.passive_batsman_index === -1 ? "Select Batsman" :
+        `Waiting: ${battingTeam[data.passive_batsman_index - 1]}`,
       bowler1: "",
       striker1: "",
       nonStriker1: ""
@@ -242,7 +329,7 @@ export default Ember.Controller.extend({
         error: (error) => {
           console.error("Error updating score:", error);
           this.set('result', error.responseJSON.message);
-          window.location.reload();
+          // window.location.reload();
         }
       });
     },
@@ -265,6 +352,107 @@ export default Ember.Controller.extend({
           this.set('result', error.responseJSON.message);
         }
       });
+    },
+    goBack() {
+      window.history.back();
+    },
+    selectBatsman(player) {
+      let resultData = {
+        player: `${player}`,
+      };
+      if (!this.get('needChoosingBatsmanTeam1')) {
+        if (this.get('needChoosingPassiveTeam1')) {
+          resultData = {
+            passive: `${player}`,
+          };
+          Ember.$.ajax({
+            url: `http://localhost:8080/api/change-batsman?id=${this.get('model.id')}`,
+            type: 'PUT',
+            data: JSON.stringify(resultData),
+            contentType: 'application/json',
+            success: (data) => {
+              this.set('result', data.message);
+            },
+            error: (error) => {
+              console.error("Error changing batsman:", error);
+              this.set('result', error.responseJSON.message);
+            }
+          });
+          return;
+        } else if (!this.get('needChoosingBatsmanTeam2')) {
+          if (this.get('needChoosingPassiveTeam2')) {
+            resultData = {
+              passive: `${player}`,
+            };
+            Ember.$.ajax({
+              url: `http://localhost:8080/api/change-batsman?id=${this.get('model.id')}`,
+              type: 'PUT',
+              data: JSON.stringify(resultData),
+              contentType: 'application/json',
+              success: (data) => {
+                this.set('result', data.message);
+              },
+              error: (error) => {
+                console.error("Error changing batsman:", error);
+                this.set('result', error.responseJSON.message);
+              }
+            });
+            return;
+          }
+        }
+      }
+      if (this.get('needChoosingPassiveTeam1') || this.get('needChoosingPassiveTeam2')) {
+        if (this.get('selected1stBatsman') === "") {
+          this.set('selected1stBatsman', player);
+          return;
+        } else {
+          resultData = {
+            player: `${this.get('selected1stBatsman')}`,
+            passive: `${player}`,
+          };
+          this.set('selected1stBatsman', "");
+        }
+      }
+      console.log(resultData);
+      Ember.$.ajax({
+        url: `http://localhost:8080/api/change-batsman?id=${this.get('model.id')}`,
+        type: 'PUT',
+        data: JSON.stringify(resultData),
+        contentType: 'application/json',
+        success: (data) => {
+          this.set('result', data.message);
+        },
+        error: (error) => {
+          console.error("Error changing batsman:", error);
+          this.set('result', error.responseJSON.message);
+        }
+      });
+    },
+    selectBowler(player) {
+      const resultData = {
+        player: `${parseInt(player) + 1}`,
+      };
+      Ember.$.ajax({
+        url: `http://localhost:8080/api/change-bowler?id=${this.get('model.id')}`,
+        type: 'PUT',
+        data: JSON.stringify(resultData),
+        contentType: 'application/json',
+        success: (data) => {
+          this.set('result', data.message);
+        },
+        error: (error) => {
+          console.error("Error changing bowler:", error);
+          this.set('result', error.responseJSON.message);
+        }
+      });
+    },
+    openDialog() {
+      let dialog = document.getElementById('matchBannerDialog');
+      dialog.showModal();
+    },
+    closeDialog() {
+      let dialog = document.getElementById('matchBannerDialog');
+      dialog.close();
     }
   }
 });

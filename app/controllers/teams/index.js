@@ -6,6 +6,7 @@ export default Ember.Controller.extend({
       return {
         id: team.id,
         name: team.name,
+        logo: team.logo,
         firstHalf: team.players.slice(0, 6),
         secondHalf: team.players.slice(6, 11)
       };

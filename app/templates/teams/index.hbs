@@ -12,7 +12,10 @@
         {{#each slicedTeams as |team|}}
         <div class="team-item">
             <div class="info">
-                <span>{{team.name}}</span>
+                <span>
+                    <img src={{team.logo}} alt="Team Logo" height="30" width="30" />
+                    {{team.name}}
+                </span>
                 <br>
                 <p>Players:</p>
                 <ul class="players">

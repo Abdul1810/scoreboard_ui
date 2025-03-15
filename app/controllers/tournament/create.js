@@ -7,13 +7,13 @@ export default Ember.Controller.extend({
     resultMessage: '',
     resultColor: '',
     name: '',
-    selectedTeamNames: Ember.computed('selectedTeams.@each', 'teams', function () {
+    selectedTeamNames: Ember.computed('selectedTeams.[]', 'teams', function () {
         let selectedTeams = this.get('selectedTeams');
         let teams = this.get('teams') || [];
         return teams.filter(team => selectedTeams.includes(team.id));
     }
     ),
-    filteredTeams: Ember.computed('selectedTeams.@each', 'teams', function () {
+    filteredTeams: Ember.computed('selectedTeams.[]', 'teams', function () {
         let selectedTeams = this.get('selectedTeams');
         let teams = this.get('teams') || [];
         if (!selectedTeams.length) {

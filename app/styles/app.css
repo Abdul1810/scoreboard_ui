@@ -10,3 +10,18 @@
   background-color: transparent;
   color: #0056b3;
 }
+
+.circle-avatar {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100px;
+  height: 100px;
+  max-width: 100px;
+  max-height: 100px;
+  border-radius: 50%;
+  background: #f4f4f4;
+  margin: 0 auto 20px;
+  cursor: pointer;
+}

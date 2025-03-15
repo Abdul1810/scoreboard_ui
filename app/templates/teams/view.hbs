@@ -37,8 +37,8 @@
                     {{player.name}}
                 </span>
                 <div class="action-buttons">
-                    <button class="calculate-btn" {{action "calculateScore" player}}>Runs</button>
-                    <button class="calculate-btn" {{action "calculateWickets" player}}>Wickets</button>
+                    <button class="calculate-btn" {{action "calculateScore" player.name}}>Runs</button>
+                    <button class="calculate-btn" {{action "calculateWickets" player.name}}>Wickets</button>
                 </div>
             </li>
             {{/each}}

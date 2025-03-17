@@ -65,19 +65,22 @@ export default Ember.Controller.extend({
       const data = JSON.parse(event.data);
       console.log(data);
       this.updateScoreTable(data);
-      this.set('isNoball', false);
-      this.set('current_batting', data.current_batting);
-      this.set('is_highlights_uploaded', data.is_highlights_uploaded);
-      this.set('is_completed', data.is_completed);
-      this.set('team1Stats', `${data.team1_score}/${data.team2_wickets} (${data.team1_balls})`);
-      this.set('team2Stats', `${data.team2_score}/${data.team1_wickets} (${data.team2_balls})`);
+      this.setProperties({
+        isNoball: false,
+        current_batting: data.current_batting,
+        is_highlights_uploaded: data.is_highlights_uploaded,
+        is_completed: data.is_completed,
+        team1Stats: `${data.team1_score}/${data.team2_wickets} (${data.team1_balls})`,
+        team2Stats: `${data.team2_score}/${data.team1_wickets} (${data.team2_balls})`,
+      });
 
       let team1BallDistribution = distributeBalls(data.team2_bowling_order, data.team1_balls);
       let team2BallDistribution = distributeBalls(data.team1_bowling_order, data.team2_balls);
 
-
-      this.set('team1TotalBalls', Ember.A(team1BallDistribution));
-      this.set('team2TotalBalls', Ember.A(team2BallDistribution));
+      this.setProperties({
+        team1TotalBalls: team1BallDistribution,
+        team2TotalBalls: team2BallDistribution,
+      });
 
       if (data.is_completed === "false") {
         this.handleMatchInProgress(data);
@@ -116,7 +119,7 @@ export default Ember.Controller.extend({
 
   disconnectWebSocket() {
     const socket = this.get('socket');
-    if (socket !== null && socket.readyState === WebSocket.OPEN) {
+    if (socket !== null) {
       socket.close();
     }
   },
@@ -130,7 +133,6 @@ export default Ember.Controller.extend({
 
     const isTeam1Batting = data.current_batting === "team1";
     const battingTeam = isTeam1Batting ? this.team1Players : this.team2Players;
-    // const bowlerName = this.getBowlerName(isTeam1Batting ? data.team1_balls : data.team2_balls);
     const bowlerName = data.active_bowler_index === -1 ? "Select Bowler" :
       isTeam1Batting ? this.get('team2Players')[data.active_bowler_index - 1] : this.get('team1Players')[data.active_bowler_index - 1];
 
@@ -266,29 +268,6 @@ export default Ember.Controller.extend({
     } else {
       this.set('team1StatsBackground', "peachpuff");
       this.set('team2StatsBackground', "peachpuff");
-    }
-  },
-
-  getBowlerName(balls) {
-    let bowlerIndex;
-    if (balls === 0) {
-      return this.get('current_batting') === "team1" ? this.get('team2Players')[0] : this.get('team1Players')[0];
-    }
-    if (balls <= 66) {
-      let over = Math.floor(balls / 6);
-      let ball = balls % 6;
-      bowlerIndex = over + (ball > 0 ? 1 : 0);
-    } else {
-      balls -= 66;
-      let over = Math.floor(balls / 6);
-      let ball = balls % 6;
-      bowlerIndex = over + (ball > 0 ? 1 : 0);
-    }
-
-    if (bowlerIndex < 0 || bowlerIndex > 11) {
-      return "Bowler";
-    } else {
-      return this.get('current_batting') === "team1" ? this.get('team2Players')[bowlerIndex - 1] : this.get('team1Players')[bowlerIndex - 1];
     }
   },
 

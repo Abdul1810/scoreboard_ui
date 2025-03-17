@@ -9,7 +9,7 @@ export default Ember.Controller.extend({
 
   initWebSocket() {
     let controller = this;
-    if (this.get('socket') !== null && this.get('socket').readyState === WebSocket.OPEN) {
+    if (this.get('socket') !== null) {
       this.get('socket').close();
     }
     let socket = new WebSocket('ws://localhost:8080/ws/matches');
@@ -58,7 +58,7 @@ export default Ember.Controller.extend({
 
   disconnectWebSocket() {
     const socket = this.get('socket');
-    if (socket !== null && socket.readyState === WebSocket.OPEN) {
+    if (socket !== OnErrorEventHandlerNonNull) {
       socket.close();
     }
   },

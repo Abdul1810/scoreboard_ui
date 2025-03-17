@@ -106,7 +106,7 @@ export default Ember.Controller.extend({
 
   disconnectWebSocket() {
     const socket = this.get('socket');
-    if (socket !== null && socket.readyState === WebSocket.OPEN) {
+    if (socket !== null) {
       socket.close();
     }
   },
@@ -119,7 +119,8 @@ export default Ember.Controller.extend({
 
     const isTeam1Batting = data.current_batting === "team1";
     const battingTeam = isTeam1Batting ? this.team1Players : this.team2Players;
-    const bowlerName = this.getBowlerName(isTeam1Batting ? data.team1_balls : data.team2_balls);
+    const bowlerName = data.active_bowler_index === -1 ? "Select Bowler" :
+      isTeam1Batting ? this.get('team2Players')[data.active_bowler_index - 1] : this.get('team1Players')[data.active_bowler_index - 1];
 
     this.setProperties({
       matchResult: `${battingTeam[data.active_batsman_index - 1]} is batting\n${battingTeam[data.passive_batsman_index - 1]} is waiting`,
@@ -171,29 +172,6 @@ export default Ember.Controller.extend({
     } else {
       this.set('team1StatsBackground', "peachpuff");
       this.set('team2StatsBackground', "peachpuff");
-    }
-  },
-
-  getBowlerName(balls) {
-    let bowlerIndex;
-    if (balls === 0) {
-      return this.get('current_batting') === "team1" ? this.get('team2Players')[0] : this.get('team1Players')[0];
-    }
-    if (balls <= 66) {
-      let over = Math.floor(balls / 6);
-      let ball = balls % 6;
-      bowlerIndex = over + (ball > 0 ? 1 : 0);
-    } else {
-      balls -= 66;
-      let over = Math.floor(balls / 6);
-      let ball = balls % 6;
-      bowlerIndex = over + (ball > 0 ? 1 : 0);
-    }
-
-    if (bowlerIndex < 0 || bowlerIndex > 11) {
-      return "Bowler";
-    } else {
-      return this.get('current_batting') === "team1" ? this.get('team2Players')[bowlerIndex - 1] : this.get('team1Players')[bowlerIndex - 1];
     }
   },
 

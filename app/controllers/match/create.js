@@ -56,9 +56,12 @@ export default Ember.Controller.extend({
       })
         .done(function (data) {
           controller.setProperties({
-            resultMessage: data.message,
+            resultMessage: data.message + ". Redirecting...",
             resultColor: "green"
           });
+          setTimeout(() => {
+            controller.transitionToRoute('match.edit', data.id);
+          }, 1500);
         })
         .fail(function (error) {
           console.error("Error creating match:", error);

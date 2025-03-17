@@ -15,7 +15,7 @@ export default Ember.Controller.extend({
 
     disconnectWebSocket() {
         const socket = this.get('socket');
-        if (socket !== null && socket.readyState === WebSocket.OPEN) {
+        if (socket !== null) {
             socket.close();
         }
     }

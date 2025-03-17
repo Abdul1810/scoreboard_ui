@@ -45,6 +45,7 @@ export default Ember.Controller.extend({
   notOutPlayersTeam1: {},
   notOutPlayersTeam2: {},
   selected1stBatsman: "",
+  isNoball: false,
 
   initWebSocket(matchId) {
     const socketUrl = `ws://localhost:8080/ws/stats?id=${matchId}`;
@@ -64,6 +65,7 @@ export default Ember.Controller.extend({
       const data = JSON.parse(event.data);
       console.log(data);
       this.updateScoreTable(data);
+      this.set('isNoball', false);
       this.set('current_batting', data.current_batting);
       this.set('is_highlights_uploaded', data.is_highlights_uploaded);
       this.set('is_completed', data.is_completed);
@@ -317,6 +319,7 @@ export default Ember.Controller.extend({
       this.set('current_batting', "none");
       const resultData = {
         update: `${score}`,
+        is_noball: this.get('isNoball').toString(),
       };
       Ember.$.ajax({
         url: `http://localhost:8080/update-stats?id=${this.get('model.id')}`,
@@ -453,6 +456,74 @@ export default Ember.Controller.extend({
     closeDialog() {
       let dialog = document.getElementById('matchBannerDialog');
       dialog.close();
-    }
+    },
+    updateNoball() {
+      this.set('isNoball', !this.get('isNoball'));
+    },
+    shareBanner() {
+      const id = this.get('model.id');
+      const imageUrl = `http://localhost:8080/image/banner?id=${id}`;
+    
+      if (navigator.canShare && navigator.canShare({ files: [] })) {
+        fetch(imageUrl)
+          .then(response => response.blob())
+          .then(blob => {
+            const file = new File([blob], 'banner.jpg', { type: blob.type });
+            return navigator.share({
+              title: 'Match Banner',
+              text: 'Check out this match banner!',
+              files: [file]
+            });
+          })
+          .catch(error => {
+            console.error('Error sharing:', error);
+            alert('Failed to share the banner.');
+          });
+      } else if (navigator.share) {
+        navigator.share({
+          title: 'Match Banner',
+          text: 'Check out this match banner!',
+          url: imageUrl
+        })
+          .catch(error => {
+            console.error('Error sharing link:', error);
+            alert('Failed to share the link.');
+          });
+      } else {
+        navigator.clipboard.writeText(`Check out this match banner\n\n${imageUrl}`)
+          .then(() => {
+            alert('Sharing not supported — link copied to clipboard!');
+          })
+          .catch(error => {
+            console.error('Error copying link:', error);
+            alert(`You can manually share this link: ${imageUrl}`);
+          });
+      }
+    },    
+    downloadBanner() {
+      let url = `http://localhost:8080/image/banner?id=${this.get('model.id')}`;
+      let fileName = `match-banner-${this.get('model.id')}.jpg`;
+
+      fetch(url)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`Failed to fetch file: ${response.statusText}`);
+          }
+          return response.blob();
+        })
+        .then((blob) => {
+          const blobUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = blobUrl;
+          link.download = fileName;
+          link.click();
+
+          window.URL.revokeObjectURL(blobUrl);
+        })
+        .catch((error) => {
+          console.error('Download failed:', error);
+          alert('Failed to download the banner.');
+        });
+    },
   }
 });

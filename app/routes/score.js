@@ -1,6 +1,11 @@
 import Ember from 'ember';
 
 export default Ember.Route.extend({
+  queryParams: {
+    view: {
+      refreshModel: true
+    }
+  },
   model(params) {
     return new Ember.RSVP.Promise((resolve) => {
       Ember.$.ajax({
@@ -64,6 +69,7 @@ export default Ember.Route.extend({
 
   actions: {
     willTransition() {
+      this.controllerFor('score').set('shouldReconnect', false);
       this.controllerFor('score').disconnectWebSocket();
       return true;
     }

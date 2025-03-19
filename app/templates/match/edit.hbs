@@ -1,6 +1,6 @@
 {{match-edit-styles}}
 <h3>Scoreboard - Update</h3>
-<button class="link-btn" {{action "goBack" }}>← Back to Matches</button>
+{{#link-to "match.index" class="link-btn"}}← Back to Matches{{/link-to}}
 <p>{{result}}</p>
 <p>{{matchResult}}</p>
 <div class="container">
@@ -140,8 +140,46 @@
     </div>
 </div>
 <br>
+<dialog id="embed-dialog">
+    <div class="dialog-content">
+        <h3>
+            🖼️Embed this match
+        </h3>
+        {{!-- <blockquote class="twitter-tweet">
+            <p lang="en" dir="ltr">LIVE: <a
+                    href="https://twitter.com/NASA_Astronauts?ref_src=twsrc%5Etfw">@NASA_Astronauts</a> Nick Hague, Suni
+                Williams, Butch Wilmore, and cosmonaut Aleksandr Gorbunov are packing up and closing the hatches as <a
+                    href="https://twitter.com/hashtag/Crew9?src=hash&amp;ref_src=twsrc%5Etfw">#Crew9</a> prepares to
+                depart from the <a href="https://twitter.com/Space_Station?ref_src=twsrc%5Etfw">@Space_Station</a>.
+                Crew-9 is scheduled to return to Earth on Tuesday, March 18. <a
+                    href="https://t.co/TpRlvLBVU1">https://t.co/TpRlvLBVU1</a></p>&mdash; NASA (@NASA) <a
+                href="https://twitter.com/NASA/status/1901827241018810694?ref_src=twsrc%5Etfw">March 18, 2025</a>
+        </blockquote>
+        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> --}}
+        <textarea id="embedCode" readonly rows="3" cols="50">{{{embedCode}}}</textarea>
+        <br>
+        <label for="scoreOnly">Score Only</label>
+        <input type="checkbox" id="scoreOnly" name="scoreOnly" checked={{scoreOnly}} {{action "toggleScoreOnly"
+            on="change" }} />
+        <br>
+        <br>
+        <div class="dialog-actions">
+            <button {{action "copyText" embedCode }} class="link-btn">
+                Copy Code
+            </button>
+            <button {{action "shareText" embedCode }} class="link-btn">
+                Share
+            </button>
+        </div>
+
+        <button {{action "closeDialog" "embed-dialog" }} class="close-btn">✖</button>
+    </div>
+</dialog>
+<button onclick={{action "openDialog" "embed-dialog" }} class="link-btn">🔗 Embed this match</button>
 {{#if (eq is_completed "true")}}
-<dialog id="matchBannerDialog">
+<br>
+<br>
+<dialog id="banner-dialog">
     <div class="dialog-content">
         <img src="http://localhost:8080/image/banner?id={{model.id}}" alt="Match Banner" class="banner-img" />
         <div class="dialog-actions">
@@ -153,11 +191,11 @@
             </button>
         </div>
 
-        <button {{action "closeDialog" }} class="close-btn">✖</button>
+        <button {{action "closeDialog" "banner-dialog" }} class="close-btn">✖</button>
     </div>
 </dialog>
 
-<button onclick={{action "openDialog" }} class="link-btn">🏆 View Match Banner</button>
+<button onclick={{action "openDialog" "banner-dialog" }} class="link-btn">🏆 View Match Banner</button>
 {{/if}}
 <br>
 <br>
@@ -220,3 +258,5 @@ wickets=team2Wickets
 bowler=bowler1
 current_batting=current_batting
 }}
+
+<button {{action "logout" }} class="link-btn">Logout</button>

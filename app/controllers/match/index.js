@@ -6,6 +6,7 @@ export default Ember.Controller.extend({
   resultMessage: "Loading matches...",
   resultColor: "blue",
   socket: null,
+  shouldReconnect: true,
 
   initWebSocket() {
     let controller = this;
@@ -20,6 +21,9 @@ export default Ember.Controller.extend({
         resultMessage: "Live updates enabled",
         resultColor: "green"
       });
+      setTimeout(function () {
+        controller.set('shouldReconnect', true);
+      }, 3000);
     };
 
     socket.onclose = function () {
@@ -27,7 +31,11 @@ export default Ember.Controller.extend({
         resultMessage: "Connection closed. Attempting to reconnect...",
         resultColor: "orange"
       });
-      setTimeout(() => controller.initWebSocket(), 3000); // Auto-reconnect
+      setTimeout(function () {
+        if (this.get('shouldReconnect')) {
+          controller.initWebSocket();
+        }
+      }, 5000);
     };
 
     socket.onerror = function () {
@@ -86,7 +94,7 @@ export default Ember.Controller.extend({
             console.error("Delete Error:", error);
           });
       }
-    }
+    },
   },
 
   willDestroy() {

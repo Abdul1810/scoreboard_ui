@@ -1,8 +1,31 @@
 import Ember from 'ember';
 
 export default Ember.Route.extend({
+  csrf: Ember.inject.service(),
   model(params) {
     return new Ember.RSVP.Promise((resolve) => {
+      Ember.$.ajax({
+        url: `http://localhost:8080/api/auth/verify`,
+        type: 'POST',
+        dataType: 'json',
+        xhrFields: {
+          withCredentials: true
+        }
+      })
+      .done((data) => {
+        if (data.error) {
+          this.transitionTo('login', {
+            queryParams: {
+              redirect: "match.edit/" + params.match_id
+            }
+          });
+        } else {
+          this.get('csrf').setToken(data.csrfToken);
+        }
+      })
+      .fail((error) => {
+        this.transitionTo('login');
+      });
       Ember.$.ajax({
         url: `http://localhost:8080/api/matches?id=${params.match_id}`,
         type: 'GET',
@@ -42,7 +65,6 @@ export default Ember.Route.extend({
       nonStriker2: "",
       bowler1: "",
       bowler2: "",
-      reconnectInterval: 3000,
       team1TotalBalls: Ember.A([]),
       team2TotalBalls: Ember.A([]),
     });
@@ -61,6 +83,7 @@ export default Ember.Route.extend({
 
   actions: {
     willTransition() {
+      this.controllerFor('match.edit').set('shouldReconnect', false);
       this.controllerFor('match.edit').disconnectWebSocket();
       return true;
     }

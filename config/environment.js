@@ -8,7 +8,8 @@ module.exports = function(environment) {
       'style-src'  : "'unsafe-inline' 'self'",
       'connect-src': "'self' ws://localhost:49152 ws://0.0.0.0:49152 http://localhost:4200/csp-report http://localhost:8080 ws://localhost:8080",
       'img-src'    : "'self' http://localhost:8080",
-      'media-src'  : "'self' http://localhost:8080"
+      'media-src'  : "'self' http://localhost:8080",
+      'frame-src'  : "'self'"
     },
     environment: environment,
     baseURL: '/',
@@ -32,6 +33,7 @@ module.exports = function(environment) {
     // ENV.APP.LOG_TRANSITIONS = true;
     // ENV.APP.LOG_TRANSITIONS_INTERNAL = true;
     // ENV.APP.LOG_VIEW_LOOKUPS = true;
+    
   }
 
   if (environment === 'test') {

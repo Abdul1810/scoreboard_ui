@@ -1,6 +1,8 @@
 import Ember from 'ember';
 
 export default Ember.Controller.extend({
+  queryParams: ['view'],
+  view: "full",
   socket: null,
   current_batting: "team1",
   team1: "",
@@ -30,9 +32,11 @@ export default Ember.Controller.extend({
   bowler1: "",
   bowler2: "",
   reconnectInterval: 3000,
+  shouldReconnect: true,
   team1TotalBalls: Ember.A([]),
   team2TotalBalls: Ember.A([]),
   highlightsPath: null,
+  is_completed: false,
 
   initWebSocket(matchId) {
     const socketUrl = `ws://localhost:8080/ws/stats?id=${matchId}`;
@@ -42,6 +46,9 @@ export default Ember.Controller.extend({
     socket.onopen = () => {
       console.log('Connected to the server');
       this.set('result', "Live Connected");
+      setTimeout(() => {
+        this.set('shouldReconnect', true);
+      }, this.get('reconnectInterval'));
     };
 
     socket.onmessage = (event) => {
@@ -53,6 +60,7 @@ export default Ember.Controller.extend({
       this.set('team1Stats', `${data.team1_score}/${data.team2_wickets} (${data.team1_balls})`);
       this.set('team2Stats', `${data.team2_score}/${data.team1_wickets} (${data.team2_balls})`);
       this.updateScoreTable(data);
+      this.set('is_completed', data.is_completed === "true");
       this.set('current_batting', data.current_batting);
       let team1BallDistribution = distributeBalls(data.team1_balls);
       let team2BallDistribution = distributeBalls(data.team2_balls);
@@ -66,7 +74,7 @@ export default Ember.Controller.extend({
         this.handleMatchCompleted(data);
       }
     };
-    
+
     function distributeBalls(totalBalls) {
       let ballsArray = [];
       let balls = totalBalls;
@@ -94,7 +102,9 @@ export default Ember.Controller.extend({
     socket.onclose = () => {
       this.set('result', "Connection closed. Attempting to reconnect...");
       setTimeout(() => {
-        this.initWebSocket(matchId);
+        if (this.shouldReconnect) {
+          this.initWebSocket(matchId);
+        }
       }, this.reconnectInterval);
     };
 
@@ -119,28 +129,44 @@ export default Ember.Controller.extend({
 
     const isTeam1Batting = data.current_batting === "team1";
     const battingTeam = isTeam1Batting ? this.team1Players : this.team2Players;
-    const bowlerName = data.active_bowler_index === -1 ? "Select Bowler" :
+    const bowlerName = data.active_bowler_index === -1 ? "Selecting Bowler" :
       isTeam1Batting ? this.get('team2Players')[data.active_bowler_index - 1] : this.get('team1Players')[data.active_bowler_index - 1];
 
+    if (data.active_batsman_index === -1 || data.passive_batsman_index === -1) {
+      this.set('matchResult', "Selecting batsman");
+    } else {
+      this.set('matchResult', `${battingTeam[data.active_batsman_index - 1]}
+        is batting\n${battingTeam[data.passive_batsman_index - 1]} is waiting`);
+    }
     this.setProperties({
-      matchResult: `${battingTeam[data.active_batsman_index - 1]} is batting\n${battingTeam[data.passive_batsman_index - 1]} is waiting`,
       team1StatsBackground: isTeam1Batting ? "aliceblue" : "white",
       team2StatsBackground: isTeam1Batting ? "white" : "aliceblue",
     });
 
+    if (data.current_batting === "team1") {
+      if (data.team1_freehits_map.includes((parseInt(data.team1_balls) + 1))) {
+        this.set('matchResult', "Free Hit");
+      }
+    } else if (data.current_batting === "team2") {
+      if (data.team2_freehits_map.includes((parseInt(data.team2_balls) + 1))) {
+        this.set('matchResult', "Free Hit");
+      }
+    }
     this.updateWicketsTable(data, bowlerName);
-
     this.setProperties(isTeam1Batting ? {
       bowler1: `${bowlerName}`,
-      striker1: `Batting: ${battingTeam[data.active_batsman_index - 1]}`,
-      nonStriker1: `Waiting: ${battingTeam[data.passive_batsman_index - 1]}`,
+      striker1: `Batting: ${data.active_batsman_index !== -1 ? battingTeam[data.active_batsman_index - 1] : "Selecting batsman"}`,
+      nonStriker1: `Waiting: ${data.passive_batsman_index !== -1 ?
+        battingTeam[data.passive_batsman_index - 1] : "Selecting batsman"}`,
       bowler2: "",
       striker2: "",
       nonStriker2: ""
     } : {
       bowler2: `${bowlerName}`,
-      striker2: `Batting: ${battingTeam[data.active_batsman_index - 1]}`,
-      nonStriker2: `Waiting: ${battingTeam[data.passive_batsman_index - 1]}`,
+      striker2: `Batting: ${data.active_batsman_index !== -1
+        ? battingTeam[data.active_batsman_index - 1] : "Selecting batsman"}`,
+      nonStriker2: `Waiting: ${data.passive_batsman_index !== -1
+        ? battingTeam[data.passive_batsman_index - 1] : "Selecting batsman"}`,
       bowler1: "",
       striker1: "",
       nonStriker1: ""
@@ -195,5 +221,79 @@ export default Ember.Controller.extend({
 
     this.set('team1Wickets', team1_outs);
     this.set('team2Wickets', team2_outs);
+  },
+  actions: {
+    openDialog(id) {
+      let dialog = document.getElementById(id);
+      dialog.showModal();
+    },
+    closeDialog(id) {
+      let dialog = document.getElementById(id);
+      dialog.close();
+    }, shareBanner() {
+      const id = this.get('model.id');
+      const imageUrl = `http://localhost:8080/image/banner?id=${id}`;
+
+      if (navigator.canShare && navigator.canShare({ files: [] })) {
+        fetch(imageUrl)
+          .then(response => response.blob())
+          .then(blob => {
+            const file = new File([blob], 'banner.jpg', { type: blob.type });
+            return navigator.share({
+              title: 'Match Banner',
+              text: 'Check out this match banner!',
+              files: [file]
+            });
+          })
+          .catch(error => {
+            console.error('Error sharing:', error);
+            alert('Failed to share the banner.');
+          });
+      } else if (navigator.share) {
+        navigator.share({
+          title: 'Match Banner',
+          text: 'Check out this match banner!',
+          url: imageUrl
+        })
+          .catch(error => {
+            console.error('Error sharing link:', error);
+            alert('Failed to share the link.');
+          });
+      } else {
+        navigator.clipboard.writeText(`Check out this match banner:\n\n${imageUrl}`)
+          .then(() => {
+            alert('Sharing not supported — link copied to clipboard!');
+          })
+          .catch(error => {
+            console.error('Error copying link:', error);
+            alert(`You can manually share this link: ${imageUrl}`);
+          });
+      }
+    },
+    downloadBanner() {
+      let url = `http://localhost:8080/image/banner?id=${this.get('model.id')}`;
+      let fileName = `match-banner-${this.get('model.id')}.jpg`;
+
+      fetch(url)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`Failed to fetch file: ${response.statusText}`);
+          }
+          return response.blob();
+        })
+        .then((blob) => {
+          const blobUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = blobUrl;
+          link.download = fileName;
+          link.click();
+
+          window.URL.revokeObjectURL(blobUrl);
+        })
+        .catch((error) => {
+          console.error('Download failed:', error);
+          alert('Failed to download the banner.');
+        });
+    },
   }
 });

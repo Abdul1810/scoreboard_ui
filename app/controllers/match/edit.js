@@ -1,6 +1,7 @@
 import Ember from 'ember';
 
 export default Ember.Controller.extend({
+  csrf: Ember.inject.service(),
   socket: null,
   current_batting: "team1",
   is_highlights_uploaded: "false",
@@ -32,6 +33,7 @@ export default Ember.Controller.extend({
   bowler1: "",
   bowler2: "",
   reconnectInterval: 3000,
+  shouldReconnect: true,
   team1TotalBalls: 0,
   team2TotalBalls: 0,
   selectedFileName: "",
@@ -46,6 +48,12 @@ export default Ember.Controller.extend({
   notOutPlayersTeam2: {},
   selected1stBatsman: "",
   isNoball: false,
+  isScoreonlyEmbed: false,
+  embedCode: Ember.computed('model.id', 'isScoreonlyEmbed', function () {
+    let scoreOnly = this.get('isScoreonlyEmbed');
+    return `<iframe src="http://localhost:4200/score/${this.get('model.id')}${scoreOnly ? '?view=score' : ''}" width="100%" height="${scoreOnly ? "350px" : "600px"}" frameborder="0" title="${this.get('model.team1')} vs ${this.get('model.team2')}"></iframe>`;
+  }),
+  csrfToken: null,
 
   initWebSocket(matchId) {
     const socketUrl = `ws://localhost:8080/ws/stats?id=${matchId}`;
@@ -56,6 +64,9 @@ export default Ember.Controller.extend({
     socket.onopen = () => {
       console.log('Connected to the server');
       this.set('result', "Live Connected");
+      setTimeout(() => {
+        this.set('shouldReconnect', true);
+      }, this.get('reconnectInterval'));
     };
 
     socket.onmessage = (event) => {
@@ -107,7 +118,9 @@ export default Ember.Controller.extend({
     socket.onclose = () => {
       this.set('result', "Connection closed. Attempting to reconnect...");
       setTimeout(() => {
-        this.initWebSocket(matchId);
+        if (this.get('shouldReconnect')) {
+          this.initWebSocket(matchId);
+        }
       }, this.reconnectInterval);
     };
 
@@ -275,22 +288,24 @@ export default Ember.Controller.extend({
     const team1_runs = Object.values(data.team1_runs);
     const team2_runs = Object.values(data.team2_runs);
 
-    this.set('team1Runs', team1_runs);
-    this.set('team2Runs', team2_runs);
-
-    this.set('team1Balls', data.team1_balls_map);
-    this.set('team2Balls', data.team2_balls_map);
-
-    this.set('team1WicketsMap', data.team1_wickets_map);
-    this.set('team2WicketsMap', data.team2_wickets_map);
+    this.setProperties({
+      team1Runs: team1_runs,
+      team2Runs: team2_runs,
+      team1Balls: data.team1_balls_map,
+      team2Balls: data.team2_balls_map,
+      team1WicketsMap: data.team1_wickets_map,
+      team2WicketsMap: data.team2_wickets_map,
+    });
   },
 
   updateWicketsTable(data) {
     const team1_outs = Object.values(data.team1_outs);
     const team2_outs = Object.values(data.team2_outs);
 
-    this.set('team1Wickets', team1_outs);
-    this.set('team2Wickets', team2_outs);
+    this.setProperties({
+      team1Wickets: team1_outs,
+      team2Wickets: team2_outs,
+    });
   },
 
   actions: {
@@ -301,17 +316,28 @@ export default Ember.Controller.extend({
         is_noball: this.get('isNoball').toString(),
       };
       Ember.$.ajax({
-        url: `http://localhost:8080/update-stats?id=${this.get('model.id')}`,
+        url: `http://localhost:8080/api/stats/update?id=${this.get('model.id')}`,
         type: 'PUT',
+        headers: {
+          'X-CSRF-Token': this.get('csrf').getToken() || '',
+          'Content-Type': 'application/json',
+        },
+        xhrFields: {
+          withCredentials: true
+        },
+        crossDomain: true,
         data: JSON.stringify(resultData),
-        contentType: 'application/json',
         success: (data) => {
           this.set('result', data.message);
         },
-        error: (error) => {
-          console.error("Error updating score:", error);
-          this.set('result', error.responseJSON.message);
-          // window.location.reload();
+        error: (xhr, textStatus, errorThrown) => {
+          console.error("Error updating score:", xhr.status, textStatus, errorThrown);
+          if (xhr.responseJSON && xhr.responseJSON.message) {
+            this.set('result', xhr.responseJSON.message);
+          } else {
+            this.set('result', `Error: ${xhr.status} - ${textStatus}`);
+            window.location.reload();
+          }
         }
       });
     },
@@ -323,11 +349,14 @@ export default Ember.Controller.extend({
         url: `http://localhost:8080/api/highlights?id=${this.get('model.id')}`,
         type: 'POST',
         data: formData,
-        contentType: false,
         processData: false,
+        contentType: false,
+        crossDomain: true,
         success: (data) => {
-          this.set('result', data.message);
-          this.set('is_highlights_uploaded', "true");
+          this.setProperties({
+            result: data.message,
+            is_highlights_uploaded: "true",
+          });
         },
         error: (error) => {
           console.error("Error uploading highlights:", error);
@@ -348,16 +377,28 @@ export default Ember.Controller.extend({
             passive: `${player}`,
           };
           Ember.$.ajax({
-            url: `http://localhost:8080/api/change-batsman?id=${this.get('model.id')}`,
+            url: `http://localhost:8080/api/stats/change-batsman?id=${this.get('model.id')}`,
             type: 'PUT',
+            headers: {
+              'X-CSRF-Token': this.get('csrf').getToken(),
+              'Content-Type': 'application/json',
+            },
+            xhrFields: {
+              withCredentials: true
+            },
             data: JSON.stringify(resultData),
             contentType: 'application/json',
+            crossDomain: true,
             success: (data) => {
               this.set('result', data.message);
             },
             error: (error) => {
-              console.error("Error changing batsman:", error);
-              this.set('result', error.responseJSON.message);
+              if (error.responseJSON && error.responseJSON.message) {
+                this.set('result', error.responseJSON.message);
+              } else {
+                this.set('result', `Error: ${error.status} - ${error.statusText}`);
+                window.location.reload();
+              }
             }
           });
           return;
@@ -367,16 +408,28 @@ export default Ember.Controller.extend({
               passive: `${player}`,
             };
             Ember.$.ajax({
-              url: `http://localhost:8080/api/change-batsman?id=${this.get('model.id')}`,
+              url: `http://localhost:8080/api/stats/change-batsman?id=${this.get('model.id')}`,
               type: 'PUT',
+              headers: {
+                'X-CSRF-Token': this.get('csrf').getToken(),
+                'Content-Type': 'application/json',
+              },
+              xhrFields: {
+                withCredentials: true
+              },
               data: JSON.stringify(resultData),
               contentType: 'application/json',
+              crossDomain: true,
               success: (data) => {
                 this.set('result', data.message);
               },
               error: (error) => {
-                console.error("Error changing batsman:", error);
-                this.set('result', error.responseJSON.message);
+                if (error.responseJSON && error.responseJSON.message) {
+                  this.set('result', error.responseJSON.message);
+                } else {
+                  this.set('result', `Error: ${error.status} - ${error.statusText}`);
+                  window.location.reload();
+                }
               }
             });
             return;
@@ -397,16 +450,28 @@ export default Ember.Controller.extend({
       }
       console.log(resultData);
       Ember.$.ajax({
-        url: `http://localhost:8080/api/change-batsman?id=${this.get('model.id')}`,
+        url: `http://localhost:8080/api/stats/change-batsman?id=${this.get('model.id')}`,
         type: 'PUT',
+        headers: {
+          'X-CSRF-Token': this.get('csrf').getToken(),
+          'Content-Type': 'application/json',
+        },
+        xhrFields: {
+          withCredentials: true
+        },
         data: JSON.stringify(resultData),
         contentType: 'application/json',
+        crossDomain: true,
         success: (data) => {
           this.set('result', data.message);
         },
         error: (error) => {
-          console.error("Error changing batsman:", error);
-          this.set('result', error.responseJSON.message);
+          if (error.responseJSON && error.responseJSON.message) {
+            this.set('result', error.responseJSON.message);
+          } else {
+            this.set('result', `Error: ${error.status} - ${error.statusText}`);
+            window.location.reload();
+          }
         }
       });
     },
@@ -415,34 +480,81 @@ export default Ember.Controller.extend({
         player: `${parseInt(player) + 1}`,
       };
       Ember.$.ajax({
-        url: `http://localhost:8080/api/change-bowler?id=${this.get('model.id')}`,
+        url: `http://localhost:8080/api/stats/change-bowler?id=${this.get('model.id')}`,
         type: 'PUT',
+        headers: {
+          'X-CSRF-Token': this.get('csrf').getToken(),
+          'Content-Type': 'application/json',
+        },
+        xhrFields: {
+          withCredentials: true
+        },
         data: JSON.stringify(resultData),
         contentType: 'application/json',
+        crossDomain: true,
         success: (data) => {
           this.set('result', data.message);
         },
         error: (error) => {
-          console.error("Error changing bowler:", error);
-          this.set('result', error.responseJSON.message);
+          if (error.responseJSON && error.responseJSON.message) {
+            this.set('result', error.responseJSON.message);
+          } else {
+            this.set('result', `Error: ${error.status} - ${error.statusText}`);
+            window.location.reload();
+          }
         }
       });
     },
-    openDialog() {
-      let dialog = document.getElementById('matchBannerDialog');
+    openDialog(id) {
+      let dialog = document.getElementById(id);
       dialog.showModal();
     },
-    closeDialog() {
-      let dialog = document.getElementById('matchBannerDialog');
+    closeDialog(id) {
+      let dialog = document.getElementById(id);
       dialog.close();
     },
     updateNoball() {
       this.set('isNoball', !this.get('isNoball'));
     },
+    toggleScoreOnly() {
+      this.set('isScoreonlyEmbed', !this.get('isScoreonlyEmbed'));
+    },
+    copyText(value) {
+      navigator.clipboard.writeText(value)
+        .then(() => {
+          alert('Copied to clipboard!');
+        })
+        .catch(error => {
+          console.error('Error copying link:', error);
+          alert('Failed to copy the link.');
+        });
+    },
+    shareText(value) {
+      if (navigator.share) {
+        navigator.share({
+          title: 'Match Score',
+          text: 'Check out this match score!',
+          url: value
+        })
+          .catch(error => {
+            console.error('Error sharing link:', error);
+            alert('Failed to share the link.');
+          });
+      } else {
+        navigator.clipboard.writeText(value)
+          .then(() => {
+            alert('Sharing not supported — Copied to clipboard!');
+          })
+          .catch(error => {
+            console.error('Error copying link:', error);
+            alert(`You can manually share this: ${value}`);
+          });
+      }
+    },
     shareBanner() {
       const id = this.get('model.id');
       const imageUrl = `http://localhost:8080/image/banner?id=${id}`;
-    
+
       if (navigator.canShare && navigator.canShare({ files: [] })) {
         fetch(imageUrl)
           .then(response => response.blob())
@@ -469,7 +581,7 @@ export default Ember.Controller.extend({
             alert('Failed to share the link.');
           });
       } else {
-        navigator.clipboard.writeText(`Check out this match banner\n\n${imageUrl}`)
+        navigator.clipboard.writeText(`Check out this match banner:\n\n${imageUrl}`)
           .then(() => {
             alert('Sharing not supported — link copied to clipboard!');
           })
@@ -478,7 +590,7 @@ export default Ember.Controller.extend({
             alert(`You can manually share this link: ${imageUrl}`);
           });
       }
-    },    
+    },
     downloadBanner() {
       let url = `http://localhost:8080/image/banner?id=${this.get('model.id')}`;
       let fileName = `match-banner-${this.get('model.id')}.jpg`;
@@ -504,5 +616,26 @@ export default Ember.Controller.extend({
           alert('Failed to download the banner.');
         });
     },
+    logout() {
+      Ember.$.ajax({
+        url: 'http://localhost:8080/api/auth/logout',
+        type: 'POST',
+        xhrFields: {
+          withCredentials: true
+        },
+        headers: {
+          'X-CSRF-Token': this.get('csrf').getToken() || '',
+          'Content-Type': 'application/json',
+        },
+      })
+        .done(() => {
+          this.get('csrf').clearToken();
+          this.set('resultMessage', "Logged out successfully");
+          window.location.reload();
+        })
+        .fail((error) => {
+          console.error("Logout Error:", error);
+        });
+    }
   }
 });

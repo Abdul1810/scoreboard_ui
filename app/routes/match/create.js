@@ -7,6 +7,10 @@ export default Ember.Route.extend({
 
     setupController(controller, model) {
         this._super(controller, model);
+        controller.setProperties({
+            resultMessage: '',
+            resultColor: '',
+        });
         controller.set('teams', model);
     }
 });

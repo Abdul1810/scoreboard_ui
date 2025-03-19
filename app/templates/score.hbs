@@ -1,10 +1,12 @@
 {{score-styles}}
-<h3>Scoreboard - View</h3>
-{{#link-to "index"}}← Back to Matches{{/link-to}}
 <p>{{result}}</p>
 <p>{{matchResult}}</p>
 <div class="container">
     <div id="team1stats" class="team-stats" style="background-color: {{team1StatsBackground}}">
+        {{#if model.team1_logo}}
+        <img src={{model.team1_logo}} alt="Team Logo" height="50" width="50" style="border-radius: 50%" />
+        <br>
+        {{/if}}
         <label>{{team1}}</label>
         <h1 style="display: flex; justify-content: space-between;margin:0">{{team1Stats}}</h1>
         <br>
@@ -18,6 +20,10 @@
         {{/if}}
     </div>
     <div id="team2stats" class="team-stats" style="background-color: {{team2StatsBackground}}">
+        {{#if model.team2_logo}}
+        <img src={{model.team2_logo}} alt="Team Logo" height="50" width="50" style="border-radius: 50%" />
+        <br>
+        {{/if}}
         <label>{{team2}}</label>
         <h1 style="display: flex; justify-content: space-between;margin:0">{{team2Stats}}</h1>
         <br>
@@ -31,10 +37,33 @@
         {{/if}}
     </div>
 </div>
+{{#if is_completed}}
+<br>
+<br>
+<dialog id="banner-dialog">
+    <div class="dialog-content">
+        <img src="http://localhost:8080/image/banner?id={{model.id}}" alt="Match Banner" class="banner-img" width="80%">
+        <div class="dialog-actions">
+            <button {{action "downloadBanner" }} class="link-btn">
+                Download
+            </button>
+            <button {{action "shareBanner" }} class="link-btn">
+                Share
+            </button>
+        </div>
+
+        <button {{action "closeDialog" "banner-dialog" }} class="close-btn">✖</button>
+    </div>
+</dialog>
+
+<button onclick={{action "openDialog" "banner-dialog" }} class="link-btn">🏆 View Match Banner</button>
+{{/if}}
+
 <br>
 {{#if highlightsPath}}
 {{#link-to "match.highlights" model.id class="link-btn"}}View Highlights{{/link-to}}
 {{/if}}
+{{#if (not-eq view "score")}}
 {{score-table
 teamId="team1"
 team=team1
@@ -78,3 +107,4 @@ wickets=team2Wickets
 bowler=bowler1
 current_batting=current_batting
 }}
+{{/if}}

@@ -15,6 +15,7 @@ export default Ember.Route.extend({
 
     actions: {
         willTransition() {
+            this.controllerFor('match.index').set('shouldReconnect', false);
             this.controllerFor('match.index').disconnectWebSocket();
             return true;
         }

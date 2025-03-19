@@ -4,7 +4,7 @@ export default Ember.Controller.extend({
   resultMessage: null,
   tournaments: null,
   tournamentsPresent: Ember.computed('tournaments.[]', function() {
-    return this.get('tournaments') != null && this.get('tournaments').length > 0;
+    return this.get('tournaments') !== null && this.get('tournaments').length > 0;
   }),
   actions: {
     calculateScore(player) {

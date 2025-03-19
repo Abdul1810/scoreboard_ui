@@ -12,37 +12,37 @@
   <div id="ongoing-matches" class="matches-list">
     <h3>On-going Matches</h3>
     {{#if ongoingMatches.length}}
-      {{#each ongoingMatches as |match|}}
-        <div class="match-item">
-          <h5>{{match.team1}} vs {{match.team2}}</h5>
-          <div class="match-actions">
-            {{#link-to "match.edit" match.id}}Edit{{/link-to}}
-            <button {{action "deleteMatch" match.id}}>Delete</button>
-          </div>
-        </div>
-      {{/each}}
+    {{#each ongoingMatches as |match|}}
+    <div class="match-item">
+      <h5>{{match.team1}} vs {{match.team2}}</h5>
+      <div class="match-actions">
+        {{#link-to "match.edit" match.id}}Edit{{/link-to}}
+        <button {{action "deleteMatch" match.id}}>Delete</button>
+      </div>
+    </div>
+    {{/each}}
     {{else}}
-      <p>No matches found</p>
+    <p>No matches found</p>
     {{/if}}
   </div>
 
   <div id="completed-matches" class="matches-list">
     <h3>Completed Matches</h3>
     {{#if completedMatches.length}}
-      {{#each completedMatches as |match|}}
-        <div class="match-item">
-          <h5>{{match.team1}} vs {{match.team2}} <span style="color: #28a745;">({{match.winner}})</span></h5>
-          <div class="match-actions">
-            {{#if match.highlights_path}}
-            {{#link-to "match.highlights" match.id class="highlight-btn"}}▶Highlights{{/link-to}}
-            {{/if}}
-            {{#link-to "match.edit" match.id}}View{{/link-to}}
-            <button {{action "deleteMatch" match.id}}>Delete</button>
-          </div>
-        </div>
-      {{/each}}
+    {{#each completedMatches as |match|}}
+    <div class="match-item">
+      <h5>{{match.team1}} vs {{match.team2}} <span style="color: #28a745;">({{match.winner}})</span></h5>
+      <div class="match-actions">
+        {{#if match.highlights_path}}
+        {{#link-to "match.highlights" match.id class="highlight-btn"}}▶Highlights{{/link-to}}
+        {{/if}}
+        {{#link-to "match.edit" match.id}}View{{/link-to}}
+        <button {{action "deleteMatch" match.id}}>Delete</button>
+      </div>
+    </div>
+    {{/each}}
     {{else}}
-      <p>No matches found</p>
+    <p>No matches found</p>
     {{/if}}
   </div>
 </div>

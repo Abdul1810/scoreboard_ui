@@ -1,11 +1,6 @@
 import Ember from 'ember';
 
 export default Ember.Route.extend({
-    queryParams: {
-        redirect: {
-            refreshModel: true
-        }
-    },
     model() {
         return {};
     },

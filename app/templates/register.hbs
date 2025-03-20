@@ -1,4 +1,4 @@
-{{title "Login"}}
+{{title "Register"}}
 <style>
     body {
         background-color: #f4f7fa;
@@ -10,7 +10,7 @@
         margin: 0;
     }
 
-    .login-container {
+    .register-container {
         background-color: #ffffff;
         padding: 2rem;
         border-radius: 12px;
@@ -77,7 +77,7 @@
 
     .alert-danger {
         background-color: #f8d7da;
-        color: #721c24;
+        color: #446ee1;
         padding: 10px;
         border: 1px solid #f5c6cb;
         border-radius: 6px;
@@ -85,12 +85,12 @@
         text-align: center;
     }
 </style>
-<div class="login-container">
-    <h2>Login</h2>
+<div class="register-container">
+    <h2>Register</h2>
     {{#if errorMessage}}
     <div class="alert alert-danger">{{errorMessage}}</div>
     {{/if}}
-    <form {{action "login" on="submit" }}>
+    <form {{action "register" on="submit" }}>
         <div class="form-group">
             <label for="username">Username</label>
             {{input type="text" value=username class="form-control" id="username" placeholder="Enter username"}}
@@ -99,9 +99,13 @@
             <label for="password">Password</label>
             {{input type="password" value=password class="form-control" id="password" placeholder="Enter password"}}
         </div>
-        <button type="submit" class="btn btn-primary">Login</button>
+        <div class="form-group">
+            <label for="confirmPassword">Confirm Password</label>
+            {{input type="password" value=confirmPassword class="form-control" id="confirmPassword" placeholder="Confirm password"}}
+        </div>
+        <button type="submit" class="btn btn-primary">Register</button>
         <br>
         <br>
     </form>
-    {{#link-to "register"}}Register here{{/link-to}}
+    {{#link-to "login"}}Login Here{{/link-to}}
 </div>

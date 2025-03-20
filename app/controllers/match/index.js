@@ -1,7 +1,7 @@
 import Ember from 'ember';
 
 export default Ember.Controller.extend({
-  csrf: Ember.inject.service(),
+  auth: Ember.inject.service(),
   ongoingMatches: [],
   completedMatches: [],
   resultMessage: "Loading matches...",
@@ -33,7 +33,7 @@ export default Ember.Controller.extend({
         resultColor: "orange"
       });
       setTimeout(function () {
-        if (this.get('shouldReconnect')) {
+        if (this.shouldReconnect) {
           controller.initWebSocket();
         }
       }, 5000);
@@ -48,6 +48,9 @@ export default Ember.Controller.extend({
     };
 
     socket.onmessage = function (event) {
+      if (event.data === "not-found") {
+        window.location.reload();
+      }
       let data = JSON.parse(event.data);
       controller.setProperties({
         ongoingMatches: [],
@@ -79,7 +82,10 @@ export default Ember.Controller.extend({
 
         Ember.$.ajax({
           url: `http://localhost:8080/api/matches?id=${matchId}`,
-          type: 'DELETE'
+          type: 'DELETE',
+          headers: {
+            'X-CSRF-Token': this.get('auth').getToken()
+          },
         })
           .done(function (data) {
             controller.setProperties({
@@ -100,13 +106,9 @@ export default Ember.Controller.extend({
       Ember.$.ajax({
         url: 'http://localhost:8080/api/auth/logout',
         type: 'POST',
-        headers: {
-          'X-CSRF-Token': this.get('csrf').getToken() || '',
-          'Content-Type': 'application/json',
-        },
       })
         .done(() => {
-          this.get('csrf').clearToken();
+          this.get('auth').clearAll();
           this.set('resultMessage', "Logged out successfully");
           this.transitionToRoute('login');
         })

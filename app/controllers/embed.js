@@ -157,7 +157,6 @@ export default Ember.Controller.extend({
     socket.onerror = () => {
       this.set('result', "Connection error. Attempting to reconnect...");
       socket.close();
-      this.initWebSocket(verificationCode);
     };
   },
 

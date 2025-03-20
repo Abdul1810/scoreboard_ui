@@ -1,7 +1,7 @@
 import Ember from 'ember';
 
 export default Ember.Controller.extend({
-  csrf: Ember.inject.service(),
+  auth: Ember.inject.service(),
   socket: null,
   current_batting: "team1",
   is_highlights_uploaded: "false",
@@ -76,7 +76,7 @@ export default Ember.Controller.extend({
 
     socket.onmessage = (event) => {
       if (event.data === "not-found") {
-
+        window.location.reload();
       }
       const data = JSON.parse(event.data);
       console.log(data);
@@ -123,7 +123,7 @@ export default Ember.Controller.extend({
     socket.onclose = () => {
       this.set('result', "Connection closed. Attempting to reconnect...");
       setTimeout(() => {
-        if (this.get('shouldReconnect')) {
+        if (this.shouldReconnect) {
           this.initWebSocket(matchId);
         }
       }, this.reconnectInterval);
@@ -324,7 +324,7 @@ export default Ember.Controller.extend({
         url: `http://localhost:8080/api/stats/update?id=${this.get('model.id')}`,
         type: 'PUT',
         headers: {
-          'X-CSRF-Token': this.get('csrf').getToken() || '',
+          'X-CSRF-Token': this.get('auth').getToken() || '',
           'Content-Type': 'application/json',
         },
 
@@ -351,6 +351,10 @@ export default Ember.Controller.extend({
       Ember.$.ajax({
         url: `http://localhost:8080/api/highlights?id=${this.get('model.id')}`,
         type: 'POST',
+        headers: {
+          'X-CSRF-Token': this.get('auth').getToken(),
+        },
+        enctype: 'multipart/form-data',
         data: formData,
         processData: false,
         contentType: false,
@@ -383,7 +387,7 @@ export default Ember.Controller.extend({
             url: `http://localhost:8080/api/stats/change-batsman?id=${this.get('model.id')}`,
             type: 'PUT',
             headers: {
-              'X-CSRF-Token': this.get('csrf').getToken(),
+              'X-CSRF-Token': this.get('auth').getToken(),
               'Content-Type': 'application/json',
             },
             data: JSON.stringify(resultData),
@@ -411,7 +415,7 @@ export default Ember.Controller.extend({
               url: `http://localhost:8080/api/stats/change-batsman?id=${this.get('model.id')}`,
               type: 'PUT',
               headers: {
-                'X-CSRF-Token': this.get('csrf').getToken(),
+                'X-CSRF-Token': this.get('auth').getToken(),
                 'Content-Type': 'application/json',
               },
               data: JSON.stringify(resultData),
@@ -451,7 +455,7 @@ export default Ember.Controller.extend({
         url: `http://localhost:8080/api/stats/change-batsman?id=${this.get('model.id')}`,
         type: 'PUT',
         headers: {
-          'X-CSRF-Token': this.get('csrf').getToken(),
+          'X-CSRF-Token': this.get('auth').getToken(),
           'Content-Type': 'application/json',
         },
 
@@ -479,7 +483,7 @@ export default Ember.Controller.extend({
         url: `http://localhost:8080/api/stats/change-bowler?id=${this.get('model.id')}`,
         type: 'PUT',
         headers: {
-          'X-CSRF-Token': this.get('csrf').getToken(),
+          'X-CSRF-Token': this.get('auth').getToken(),
           'Content-Type': 'application/json',
         },
 
@@ -506,7 +510,7 @@ export default Ember.Controller.extend({
         url: `http://localhost:8080/api/embed?id=${this.get('model.id')}`,
         type: 'POST',
         headers: {
-          'X-CSRF-Token': this.get('csrf').getToken(),
+          'X-CSRF-Token': this.get('auth').getToken(),
           'Content-Type': 'application/json',
         },
         crossDomain: true,
@@ -533,7 +537,10 @@ export default Ember.Controller.extend({
         url: `http://localhost:8080/api/embed?id=${this.get('model.id')}`,
         type: 'DELETE',
         headers: {
-          'X-CSRF-Token': this.get('csrf').getToken(),
+          'X-CSRF-Token': this.get('auth').getToken()
+        },
+        headers: {
+          'X-CSRF-Token': this.get('auth').getToken(),
           'Content-Type': 'application/json',
         },
         crossDomain: true,

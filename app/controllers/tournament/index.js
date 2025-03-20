@@ -9,7 +9,10 @@ export default Ember.Controller.extend({
 
                 Ember.$.ajax({
                     url: `http://localhost:8080/api/tournaments?id=${tournamentId}`,
-                    type: 'DELETE'
+                    type: 'DELETE',
+                    headers: {
+                        'X-CSRF-Token': this.get('auth').getToken()
+                    },
                 })
                     .done(function (data) {
                         let tournaments = controller.get('tournaments');

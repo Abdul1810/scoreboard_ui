@@ -4,12 +4,18 @@ export default Ember.Controller.extend({
     auth: Ember.inject.service(),
     errorMessage: null,
     actions: {
-        login() {
+        register() {
             const username = this.get('username');
             const password = this.get('password');
+            const confirmPassword = this.get('confirmPassword');
+
+            if (password !== confirmPassword) {
+                this.set('errorMessage', 'Passwords do not match.');
+                return;
+            }
 
             Ember.$.ajax({
-                url: 'http://localhost:8080/api/auth/login',
+                url: 'http://localhost:8080/api/auth/register',
                 type: 'POST',
                 dataType: 'json',
                 data: JSON.stringify({ username, password }),
@@ -19,8 +25,12 @@ export default Ember.Controller.extend({
                     if (data.error) {
                         this.set('errorMessage', data.error);
                     } else {
-                        this.get('auth').setToken(data.csrfToken);
-                        this.get('auth').setUsername(data.username);
+                        this.set('errorMessage', data.message);
+                        const csrf = this.get('auth');
+                        if (data.csrfToken) {
+                            csrf.setToken(data.csrfToken);
+                            csrf.setUsername(data.username);
+                        }
                         const redirect = this.get('redirect');
                         if (redirect) {
                             window.location.href = redirect;

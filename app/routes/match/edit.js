@@ -1,7 +1,7 @@
 import Ember from 'ember';
 
 export default Ember.Route.extend({
-  csrf: Ember.inject.service(),
+  auth: Ember.inject.service(),
   model(params) {
     return new Ember.RSVP.Promise((resolve) => {
       Ember.$.ajax({

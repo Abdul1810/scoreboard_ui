@@ -1,6 +1,7 @@
 import Ember from 'ember';
 
 export default Ember.Controller.extend({
+  auth: Ember.inject.service(),
   teams: [],
   selectedTeam1: null,
   selectedTeam2: null,
@@ -51,6 +52,9 @@ export default Ember.Controller.extend({
       Ember.$.ajax({
         url: 'http://localhost:8080/api/matches',
         type: 'POST',
+        headers: {
+          'X-CSRF-Token': this.get('auth').getToken()
+        },
         contentType: 'application/json',
         data: JSON.stringify(newMatch)
       })

@@ -1,6 +1,7 @@
 import Ember from 'ember';
 
 export default Ember.Controller.extend({
+    auth: Ember.inject.service(),
     teamName: '',
     teamLogo: null,
     teamLogoURL: '',
@@ -40,6 +41,9 @@ export default Ember.Controller.extend({
             Ember.$.ajax({
                 url: 'http://localhost:8080/api/teams',
                 type: 'POST',
+                headers: {
+                    'X-CSRF-Token': this.get('auth').getToken()
+                },
                 data: formData,
                 processData: false,
                 contentType: false

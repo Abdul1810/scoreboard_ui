@@ -8,6 +8,9 @@ export default Ember.Controller.extend({
             Ember.$.ajax({
                 url: `http://localhost:8080/api/embed/${id}`,
                 type: 'DELETE',
+                headers: {
+                  'X-CSRF-Token': this.get('auth').getToken()
+                },
                 dataType: 'json',
             })
                 .done((data) => {

@@ -1,7 +1,7 @@
 import Ember from 'ember';
 
 export default Ember.Route.extend({
-    csrf: Ember.inject.service(),
+    auth: Ember.inject.service(),
     router: Ember.inject.service(),
     init() {
         this._super(...arguments);
@@ -14,14 +14,14 @@ export default Ember.Route.extend({
         const currentRouteName = transition.targetName;
         console.log('Route changing to:', currentRouteName);
 
-        const allowedRoutes = ['login', 'embed'];
+        const allowedRoutes = ['login', 'register', 'embed'];
         if (!allowedRoutes.includes(currentRouteName)) {
             this.verifyUser();
         }
     },
 
     verifyUser() {
-        const csrf = this.get('csrf');
+        const csrf = this.get('auth');
         if (!csrf.getToken()) {
             Ember.$.ajax({
                 url: `http://localhost:8080/api/auth/verify`,
@@ -41,6 +41,7 @@ export default Ember.Route.extend({
                     } else {
                         console.log('Verification succeeded, setting CSRF token');
                         csrf.setToken(data.csrfToken);
+                        csrf.setUsername(data.username);
                     }
                 })
                 .fail(() => {

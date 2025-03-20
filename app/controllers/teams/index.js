@@ -19,6 +19,9 @@ export default Ember.Controller.extend({
         Ember.$.ajax({
           url: `http://localhost:8080/api/teams?id=${teamId}`,
           type: 'DELETE',
+          headers: {
+            'X-CSRF-Token': this.get('auth').getToken()
+          },
           dataType: 'json',
         })
           .done(() => {

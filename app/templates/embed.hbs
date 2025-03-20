@@ -1,4 +1,9 @@
 {{score-styles}}
+{{#if is_disconnected}}
+<img src="/404.jpg" alt="Match Disconnected" width="200px" height="200px" style="margin: 0 auto; display: block;" />
+<h3>Match Not Found</h3>
+<p>Please check the link and try again.</p>
+{{else}}
 <p>{{result}}</p>
 <p>{{matchResult}}</p>
 <div class="container">
@@ -107,4 +112,5 @@ wickets=team2Wickets
 bowler=bowler1
 current_batting=current_batting
 }}
+{{/if}}
 {{/if}}

@@ -1,10 +1,12 @@
 import Ember from 'ember';
 
 export default Ember.Controller.extend({
-  queryParams: ['view'],
+  queryParams: ['verificationCode', 'view'],
+  verificationCode: null,
   view: "full",
   socket: null,
   current_batting: "team1",
+  matchId: null,
   team1: "",
   team2: "",
   team1Players: Ember.A([]),
@@ -31,47 +33,95 @@ export default Ember.Controller.extend({
   nonStriker2: "",
   bowler1: "",
   bowler2: "",
-  reconnectInterval: 3000,
-  shouldReconnect: true,
   team1TotalBalls: Ember.A([]),
   team2TotalBalls: Ember.A([]),
   highlightsPath: null,
   is_completed: false,
+  is_disconnected: false,
+  verificationCodeObserved: Ember.observer('verificationCode', function () {
+    const verificationCode = this.get('verificationCode');
+    console.log("Verification Code:", verificationCode);
+    if (verificationCode) {
+      this.initWebSocket(verificationCode);
+    } else {
+      this.set('result', "No verification code provided");
+    }
+  }),
 
-  initWebSocket(matchId) {
-    const socketUrl = `ws://localhost:8080/ws/stats?id=${matchId}`;
-    this.set('socket', new WebSocket(socketUrl));
-    const socket = this.get('socket');
+  initWebSocket(verificationCode) {
+    let socket = this.get('socket');
+    socket && socket.close();
+    const socketUrl = `ws://localhost:8080/ws/score?verificationCode=${verificationCode}`;
+    socket = new WebSocket(socketUrl);
+    this.set('socket', socket);
 
     socket.onopen = () => {
       console.log('Connected to the server');
       this.set('result', "Live Connected");
-      setTimeout(() => {
-        this.set('shouldReconnect', true);
-      }, this.get('reconnectInterval'));
     };
 
     socket.onmessage = (event) => {
-      if (event.data === "not-found") {
-        window.location.reload();
-      }
       const data = JSON.parse(event.data);
       console.log(data);
-      this.set('team1Stats', `${data.team1_score}/${data.team2_wickets} (${data.team1_balls})`);
-      this.set('team2Stats', `${data.team2_score}/${data.team1_wickets} (${data.team2_balls})`);
-      this.updateScoreTable(data);
-      this.set('is_completed', data.is_completed === "true");
-      this.set('current_batting', data.current_batting);
-      let team1BallDistribution = distributeBalls(data.team1_balls);
-      let team2BallDistribution = distributeBalls(data.team2_balls);
-
-      this.set('team1TotalBalls', Ember.A(team1BallDistribution));
-      this.set('team2TotalBalls', Ember.A(team2BallDistribution));
-
-      if (data.is_completed === "false") {
-        this.handleMatchInProgress(data);
+      if (data.details) {
+        this.setProperties({
+          current_batting: "team1",
+          matchId: null,
+          team1: "",
+          team2: "",
+          team1Players: Ember.A([]),
+          team2Players: Ember.A([]),
+          team1Runs: Ember.A([]),
+          team2Runs: Ember.A([]),
+          team1Balls: Ember.A([]),
+          team2Balls: Ember.A([]),
+          team1WicketsMap: Ember.A([]),
+          team2WicketsMap: Ember.A([]),
+          team1Wickets: Ember.A([]),
+          team2Wickets: Ember.A([]),
+          result: "",
+          matchResult: "",
+          team1Stats: "",
+          team2Stats: "",
+          team1StatsBackground: "white",
+          team2StatsBackground: "white",
+          active_batsman_index: 0,
+          passive_batsman_index: 0,
+          striker1: "",
+          striker2: "",
+          nonStriker1: "",
+          nonStriker2: "",
+          bowler1: "",
+          bowler2: "",
+          team1TotalBalls: Ember.A([]),
+          team2TotalBalls: Ember.A([]),
+          highlightsPath: null,
+        });
+        document.title = `${data.details.team1} vs ${data.details.team2}`;
+        this.setProperties({
+          team1Players: data.details.team1_players,
+          team2Players: data.details.team2_players,
+          team1: data.details.team1,
+          team2: data.details.team2,
+          highlightsPath: data.details.highlights_path,
+          matchId: data.details.id,
+        });
       } else {
-        this.handleMatchCompleted(data);
+        this.set('team1Stats', `${data.team1_score}/${data.team2_wickets} (${data.team1_balls})`);
+        this.set('team2Stats', `${data.team2_score}/${data.team1_wickets} (${data.team2_balls})`);
+        this.updateScoreTable(data);
+        this.set('is_completed', data.is_completed === "true");
+        this.set('current_batting', data.current_batting);
+        let team1BallDistribution = distributeBalls(data.team1_balls);
+        let team2BallDistribution = distributeBalls(data.team2_balls);
+        this.set('team1TotalBalls', Ember.A(team1BallDistribution));
+        this.set('team2TotalBalls', Ember.A(team2BallDistribution));
+
+        if (data.is_completed === "false") {
+          this.handleMatchInProgress(data);
+        } else {
+          this.handleMatchCompleted(data);
+        }
       }
     };
 
@@ -100,17 +150,14 @@ export default Ember.Controller.extend({
     }
 
     socket.onclose = () => {
+      this.set('is_disconnected', true);
       this.set('result', "Connection closed. Attempting to reconnect...");
-      setTimeout(() => {
-        if (this.shouldReconnect) {
-          this.initWebSocket(matchId);
-        }
-      }, this.reconnectInterval);
     };
 
     socket.onerror = () => {
       this.set('result', "Connection error. Attempting to reconnect...");
       socket.close();
+      this.initWebSocket(verificationCode);
     };
   },
 
@@ -231,7 +278,7 @@ export default Ember.Controller.extend({
       let dialog = document.getElementById(id);
       dialog.close();
     }, shareBanner() {
-      const id = this.get('model.id');
+      const id = this.get('matchId');
       const imageUrl = `http://localhost:8080/image/banner?id=${id}`;
 
       if (navigator.canShare && navigator.canShare({ files: [] })) {
@@ -271,8 +318,8 @@ export default Ember.Controller.extend({
       }
     },
     downloadBanner() {
-      let url = `http://localhost:8080/image/banner?id=${this.get('model.id')}`;
-      let fileName = `match-banner-${this.get('model.id')}.jpg`;
+      let url = `http://localhost:8080/image/banner?id=${this.get('matchId')}`;
+      let fileName = `match-banner-${this.get('matchId')}.jpg`;
 
       fetch(url)
         .then((response) => {

@@ -16,12 +16,15 @@ export default Ember.Controller.extend({
   actions: {
     deleteTeam(teamId) {
       if (confirm("Are you sure you want to delete this team?")) {
-        fetch(`http://localhost:8080/api/teams?id=${teamId}`, { method: 'DELETE' })
-          .then(response => response.json())
-          .then(() => {
+        Ember.$.ajax({
+          url: `http://localhost:8080/api/teams?id=${teamId}`,
+          type: 'DELETE',
+          dataType: 'json',
+        })
+          .done(() => {
             this.set('model', this.get('model').filter(team => team.id !== teamId));
           })
-          .catch(error => {
+          .fail((error) => {
             console.error("Delete Error:", error);
           });
       }

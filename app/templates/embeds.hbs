@@ -1,0 +1,24 @@
+{{title "Embeds"}}
+{{match-styles}}
+<div class="container">
+    <h1>Scoreboard - Matches</h1>
+    <div class="create-links">
+        {{#link-to "match.index"}}All Matches{{/link-to}}
+    </div>
+    <p>{{resultMessage}}</p>
+    <h3>All Embeds</h3>
+    {{#if embeds.length}}
+    {{#each embeds as |embed|}}
+    {{!-- embed.id, embed.embed_code --}}
+    <div class="match-item">
+        <h5>{{embed.id}}. {{embed.team1}} vs {{embed.team2}}</h5>
+        <div class="match-actions">
+            <button class="primary-btn" {{action "copyCode" embed.id}}>Copy</button>
+            <button {{action "deleteEmbed" embed.id}}>Delete</button>
+        </div>
+    </div>
+    {{/each}}
+    {{else}}
+    <p>No Embeds found</p>
+    {{/if}}
+</div>

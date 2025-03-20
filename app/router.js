@@ -7,8 +7,9 @@ const Router = Ember.Router.extend({
 
 Router.map(function () {
   this.route('index', { path: '/' });
-  this.route('login', { path: '/login'});
-  this.route('score', { path: '/score/:match_id' });
+  this.route('login', { path: '/login' });
+  this.route('embed', { path: '/embed' });
+  this.route('embeds', { path: '/embeds' });
   this.route('teams', function () {
     this.route('index', { path: '/' });
     this.route('create', { path: '/create' });

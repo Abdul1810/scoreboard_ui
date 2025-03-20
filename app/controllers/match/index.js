@@ -1,6 +1,7 @@
 import Ember from 'ember';
 
 export default Ember.Controller.extend({
+  csrf: Ember.inject.service(),
   ongoingMatches: [],
   completedMatches: [],
   resultMessage: "Loading matches...",
@@ -95,6 +96,24 @@ export default Ember.Controller.extend({
           });
       }
     },
+    logout() {
+      Ember.$.ajax({
+        url: 'http://localhost:8080/api/auth/logout',
+        type: 'POST',
+        headers: {
+          'X-CSRF-Token': this.get('csrf').getToken() || '',
+          'Content-Type': 'application/json',
+        },
+      })
+        .done(() => {
+          this.get('csrf').clearToken();
+          this.set('resultMessage', "Logged out successfully");
+          this.transitionToRoute('login');
+        })
+        .fail((error) => {
+          console.error("Logout Error:", error);
+        });
+    }
   },
 
   willDestroy() {

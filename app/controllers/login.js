@@ -8,15 +8,13 @@ export default Ember.Controller.extend({
         login() {
             const username = this.get('username');
             const password = this.get('password');
+
             Ember.$.ajax({
                 url: 'http://localhost:8080/api/auth/login',
                 type: 'POST',
                 dataType: 'json',
                 data: JSON.stringify({ username, password }),
-                contentType: 'application/json',
-                xhrFields: {
-                    withCredentials: true
-                }
+                contentType: 'application/json'
             })
                 .done((data) => {
                     if (data.error) {
@@ -24,9 +22,7 @@ export default Ember.Controller.extend({
                     } else {
                         const redirect = this.get('redirect');
                         if (redirect) {
-                            const route = redirect.split('/')[0];
-                            const id = redirect.split('/')[1];
-                            this.transitionToRoute(route, id);
+                            window.location.href = redirect;
                         } else {
                             this.transitionToRoute('match.index');
                         }

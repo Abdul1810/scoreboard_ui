@@ -49,9 +49,15 @@ export default Ember.Controller.extend({
   selected1stBatsman: "",
   isNoball: false,
   isScoreonlyEmbed: false,
-  embedCode: Ember.computed('model.id', 'isScoreonlyEmbed', function () {
-    let scoreOnly = this.get('isScoreonlyEmbed');
-    return `<iframe src="http://localhost:4200/score/${this.get('model.id')}${scoreOnly ? '?view=score' : ''}" width="100%" height="${scoreOnly ? "350px" : "600px"}" frameborder="0" title="${this.get('model.team1')} vs ${this.get('model.team2')}"></iframe>`;
+  embedVerificationId: null,
+  embedCode: Ember.computed('isScoreonlyEmbed', 'model.id', 'embedVerificationId', function () {
+    let verificationId = this.get('embedVerificationId');
+    if (verificationId === null) {
+      return null;
+    } else {
+      let scoreOnly = this.get('isScoreonlyEmbed');
+      return `<iframe src="http://localhost:4200/embed?verificationCode=${verificationId}${scoreOnly ? '&view=score' : ''}" width="100%" height="${scoreOnly ? "350px" : "600px"}" frameborder="0" title="${this.get('model.team1')} vs ${this.get('model.team2')}"></iframe>`;
+    }
   }),
   csrfToken: null,
 
@@ -60,7 +66,6 @@ export default Ember.Controller.extend({
     this.set('socket', new WebSocket(socketUrl));
 
     const socket = this.get('socket');
-
     socket.onopen = () => {
       console.log('Connected to the server');
       this.set('result', "Live Connected");
@@ -71,7 +76,7 @@ export default Ember.Controller.extend({
 
     socket.onmessage = (event) => {
       if (event.data === "not-found") {
-        window.location.reload();
+
       }
       const data = JSON.parse(event.data);
       console.log(data);
@@ -322,9 +327,7 @@ export default Ember.Controller.extend({
           'X-CSRF-Token': this.get('csrf').getToken() || '',
           'Content-Type': 'application/json',
         },
-        xhrFields: {
-          withCredentials: true
-        },
+
         crossDomain: true,
         data: JSON.stringify(resultData),
         success: (data) => {
@@ -336,7 +339,7 @@ export default Ember.Controller.extend({
             this.set('result', xhr.responseJSON.message);
           } else {
             this.set('result', `Error: ${xhr.status} - ${textStatus}`);
-            window.location.reload();
+
           }
         }
       });
@@ -383,9 +386,6 @@ export default Ember.Controller.extend({
               'X-CSRF-Token': this.get('csrf').getToken(),
               'Content-Type': 'application/json',
             },
-            xhrFields: {
-              withCredentials: true
-            },
             data: JSON.stringify(resultData),
             contentType: 'application/json',
             crossDomain: true,
@@ -397,7 +397,7 @@ export default Ember.Controller.extend({
                 this.set('result', error.responseJSON.message);
               } else {
                 this.set('result', `Error: ${error.status} - ${error.statusText}`);
-                window.location.reload();
+
               }
             }
           });
@@ -414,9 +414,6 @@ export default Ember.Controller.extend({
                 'X-CSRF-Token': this.get('csrf').getToken(),
                 'Content-Type': 'application/json',
               },
-              xhrFields: {
-                withCredentials: true
-              },
               data: JSON.stringify(resultData),
               contentType: 'application/json',
               crossDomain: true,
@@ -428,7 +425,7 @@ export default Ember.Controller.extend({
                   this.set('result', error.responseJSON.message);
                 } else {
                   this.set('result', `Error: ${error.status} - ${error.statusText}`);
-                  window.location.reload();
+
                 }
               }
             });
@@ -439,6 +436,7 @@ export default Ember.Controller.extend({
       if (this.get('needChoosingPassiveTeam1') || this.get('needChoosingPassiveTeam2')) {
         if (this.get('selected1stBatsman') === "") {
           this.set('selected1stBatsman', player);
+          console.log("Selected 1st Batsman:", this.get('selected1stBatsman'));
           return;
         } else {
           resultData = {
@@ -456,9 +454,7 @@ export default Ember.Controller.extend({
           'X-CSRF-Token': this.get('csrf').getToken(),
           'Content-Type': 'application/json',
         },
-        xhrFields: {
-          withCredentials: true
-        },
+
         data: JSON.stringify(resultData),
         contentType: 'application/json',
         crossDomain: true,
@@ -470,7 +466,7 @@ export default Ember.Controller.extend({
             this.set('result', error.responseJSON.message);
           } else {
             this.set('result', `Error: ${error.status} - ${error.statusText}`);
-            window.location.reload();
+
           }
         }
       });
@@ -486,9 +482,7 @@ export default Ember.Controller.extend({
           'X-CSRF-Token': this.get('csrf').getToken(),
           'Content-Type': 'application/json',
         },
-        xhrFields: {
-          withCredentials: true
-        },
+
         data: JSON.stringify(resultData),
         contentType: 'application/json',
         crossDomain: true,
@@ -500,7 +494,61 @@ export default Ember.Controller.extend({
             this.set('result', error.responseJSON.message);
           } else {
             this.set('result', `Error: ${error.status} - ${error.statusText}`);
-            window.location.reload();
+          }
+        }
+      });
+    },
+    generateVerificationId() {
+      let dialog = document.getElementById('embed-dialog');
+      dialog.showModal();
+      this.set('embedVerificationId', null);
+      Ember.$.ajax({
+        url: `http://localhost:8080/api/embed?id=${this.get('model.id')}`,
+        type: 'POST',
+        headers: {
+          'X-CSRF-Token': this.get('csrf').getToken(),
+          'Content-Type': 'application/json',
+        },
+        crossDomain: true,
+        success: (data) => {
+          this.set('embedVerificationId', data.embed_code);
+        },
+        error: (error) => {
+          console.error("Error generating verification ID:", error);
+          if (error.responseJSON && error.responseJSON.message) {
+            this.set('result', error.responseJSON.message);
+          } else {
+            this.set('result', `Error: ${error.status} - ${error.statusText}`);
+          }
+        }
+      });
+    },
+    deleteVerificationId() {
+      let verificationId = this.get('embedVerificationId');
+      if (verificationId === null) {
+        alert("No verification ID to delete");
+        return;
+      }
+      Ember.$.ajax({
+        url: `http://localhost:8080/api/embed?id=${this.get('model.id')}`,
+        type: 'DELETE',
+        headers: {
+          'X-CSRF-Token': this.get('csrf').getToken(),
+          'Content-Type': 'application/json',
+        },
+        crossDomain: true,
+        success: (data) => {
+          let dialog = document.getElementById('embed-dialog');
+          dialog.close();
+          this.set('embedVerificationId', null);
+          this.set('result', data.message);
+        },
+        error: (error) => {
+          console.error("Error deleting verification ID:", error);
+          if (error.responseJSON && error.responseJSON.message) {
+            this.set('result', error.responseJSON.message);
+          } else {
+            this.set('result', `Error: ${error.status} - ${error.statusText}`);
           }
         }
       });
@@ -616,26 +664,5 @@ export default Ember.Controller.extend({
           alert('Failed to download the banner.');
         });
     },
-    logout() {
-      Ember.$.ajax({
-        url: 'http://localhost:8080/api/auth/logout',
-        type: 'POST',
-        xhrFields: {
-          withCredentials: true
-        },
-        headers: {
-          'X-CSRF-Token': this.get('csrf').getToken() || '',
-          'Content-Type': 'application/json',
-        },
-      })
-        .done(() => {
-          this.get('csrf').clearToken();
-          this.set('resultMessage', "Logged out successfully");
-          window.location.reload();
-        })
-        .fail((error) => {
-          console.error("Logout Error:", error);
-        });
-    }
   }
 });

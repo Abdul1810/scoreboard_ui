@@ -6,6 +6,7 @@
     {{#link-to "match.create"}}+ Create New Match{{/link-to}}
     {{#link-to "teams.create"}}+ Create New Team{{/link-to}}
     {{#link-to "tournament.create"}}+ Create New Tournament{{/link-to}}
+    {{#link-to "embeds"}}All Embeds{{/link-to}}
   </div>
   <p style="color: {{resultColor}};">{{resultMessage}}</p>
 
@@ -45,4 +46,5 @@
     <p>No matches found</p>
     {{/if}}
   </div>
+  <button {{action "logout" }} class="link-btn">Logout</button>
 </div>

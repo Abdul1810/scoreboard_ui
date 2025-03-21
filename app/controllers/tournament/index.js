@@ -1,12 +1,14 @@
 import Ember from 'ember';
 
 export default Ember.Controller.extend({
+    auth: Ember.inject.service(),
+    resultMessage: "",
+    resultColor: "blue",
     tournaments: [],
     actions: {
         deleteTournament(tournamentId) {
             if (confirm("Are you sure you want to delete this tournament?")) {
                 let controller = this;
-
                 Ember.$.ajax({
                     url: `http://localhost:8080/api/tournaments?id=${tournamentId}`,
                     type: 'DELETE',

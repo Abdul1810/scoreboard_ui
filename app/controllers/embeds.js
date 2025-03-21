@@ -1,12 +1,13 @@
 import Ember from 'ember';
 
 export default Ember.Controller.extend({
+    auth: Ember.inject.service('auth'),
     embeds: Ember.A([]),
     resultMessage: null,
     actions: {
         deleteEmbed(id) {
             Ember.$.ajax({
-                url: `http://localhost:8080/api/embed/${id}`,
+                url: `http://localhost:8080/api/embed?id=${id}`,
                 type: 'DELETE',
                 headers: {
                   'X-CSRF-Token': this.get('auth').getToken()

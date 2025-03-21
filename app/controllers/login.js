@@ -1,6 +1,8 @@
 import Ember from 'ember';
 
 export default Ember.Controller.extend({
+    queryParams: ['redirect'],
+    redirect: null,
     auth: Ember.inject.service(),
     errorMessage: null,
     actions: {
@@ -22,6 +24,7 @@ export default Ember.Controller.extend({
                         this.get('auth').setToken(data.csrfToken);
                         this.get('auth').setUsername(data.username);
                         const redirect = this.get('redirect');
+                        console.log('Redirect URL:', redirect);
                         if (redirect) {
                             window.location.href = redirect;
                         } else {

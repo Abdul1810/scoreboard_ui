@@ -14,7 +14,19 @@ export default Ember.Controller.extend({
     if (this.get('socket') !== null) {
       this.get('socket').close();
     }
-    let socket = new WebSocket('ws://localhost:8080/ws/matches');
+
+    let socket = null;
+    try {
+      socket = new WebSocket('ws://localhost:8080/ws/matches');
+    } catch (error) {
+      console.error("WebSocket Error:", error);
+      controller.setProperties({
+        resultMessage: "WebSocket connection failed",
+        resultColor: "red"
+      });
+      window.location.reload();
+      return;
+    }
 
     socket.onopen = function () {
       console.log("WebSocket Connection Established");
@@ -24,7 +36,7 @@ export default Ember.Controller.extend({
       });
       setTimeout(function () {
         controller.set('shouldReconnect', true);
-      }, 3000);
+      }, 5000);
     };
 
     socket.onclose = function () {
@@ -45,6 +57,7 @@ export default Ember.Controller.extend({
         resultColor: "red"
       });
       socket.close();
+      window.location.reload();
     };
 
     socket.onmessage = function (event) {

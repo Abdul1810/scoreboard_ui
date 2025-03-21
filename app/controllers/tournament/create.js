@@ -69,14 +69,12 @@ export default Ember.Controller.extend({
                 data: JSON.stringify(newTournament)
             })
                 .done(function (data) {
-                    console.log("data", data);
                     controller.setProperties({
                         resultMessage: "Tournament created successfully!",
                         resultColor: "green"
                     });
                 })
                 .fail(function (jqXHR) {
-                    console.error(jqXHR);
                     controller.setProperties({
                         resultMessage: jqXHR.responseJSON.error,
                         resultColor: "red"

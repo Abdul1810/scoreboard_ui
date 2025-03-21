@@ -32,7 +32,7 @@ export default Ember.Controller.extend({
   nonStriker2: "",
   bowler1: "",
   bowler2: "",
-  reconnectInterval: 3000,
+  reconnectInterval: 5000,
   shouldReconnect: true,
   team1TotalBalls: 0,
   team2TotalBalls: 0,
@@ -132,6 +132,7 @@ export default Ember.Controller.extend({
     socket.onerror = () => {
       this.set('result', "Connection error. Attempting to reconnect...");
       socket.close();
+      window.location.reload();
     };
   },
 

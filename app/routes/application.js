@@ -23,6 +23,7 @@ export default Ember.Route.extend({
     verifyUser() {
         const csrf = this.get('auth');
         if (!csrf.getToken()) {
+            console.log('CSRF token not found, sending verification request...');
             Ember.$.ajax({
                 url: `http://localhost:8080/api/auth/verify`,
                 type: 'POST',
@@ -31,13 +32,6 @@ export default Ember.Route.extend({
                 .done((data) => {
                     if (data.error) {
                         console.error('Verification failed:', data.error);
-                        Ember.run(() => {
-                            this.transitionTo('login', {
-                                queryParams: {
-                                    redirect: window.location.href,
-                                },
-                            });
-                        });
                     } else {
                         console.log('Verification succeeded, setting CSRF token');
                         csrf.setToken(data.csrfToken);
@@ -46,13 +40,6 @@ export default Ember.Route.extend({
                 })
                 .fail(() => {
                     console.error('Verification request failed');
-                    Ember.run(() => {
-                        this.transitionTo('login', {
-                            queryParams: {
-                                redirect: window.location.href,
-                            },
-                        });
-                    });
                 });
         }
     },

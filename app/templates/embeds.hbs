@@ -1,7 +1,7 @@
 {{title "Embeds"}}
 {{match-styles}}
 <div class="container">
-    <h1>Scoreboard - Matches</h1>
+    <h1>Scoreboard - Embeds</h1>
     <div class="create-links">
         {{#link-to "match.index"}}All Matches{{/link-to}}
     </div>
@@ -9,7 +9,6 @@
     <h3>All Embeds</h3>
     {{#if embeds.length}}
     {{#each embeds as |embed|}}
-    {{!-- embed.id, embed.embed_code --}}
     <div class="match-item">
         <h5>{{embed.id}}. {{embed.team1}} vs {{embed.team2}}</h5>
         <div class="match-actions">

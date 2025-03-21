@@ -2,6 +2,6 @@ import Ember from 'ember';
 
 export default Ember.Route.extend({
     activate() {
-        this.transitionToRoute('match.index');
+        this.transitionTo('match.index');
     }
 });
